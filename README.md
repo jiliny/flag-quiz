@@ -2,6 +2,8 @@
 
 A kid-friendly cross-platform flag quiz PWA for ages 5+. Built with React + Vite + TypeScript + Tailwind. Three progressively unlocked levels, English/Chinese toggle, single-device local progress, fully offline-capable once installed.
 
+> **Working on this codebase?** Start with [AGENTS.md](AGENTS.md) — it's the developer / AI-agent hand-off guide covering architecture, conventions, gotchas, and common tasks.
+
 ## Features
 
 - **3 difficulty levels**, unlocked progressively:
