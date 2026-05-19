@@ -12,21 +12,25 @@ const en = {
 
   levels: {
     easy: 'Easy',
+    fill: 'Fill in',
     medium: 'Medium',
     hard: 'Hard',
     easyDesc: 'Tap the right name',
+    fillDesc: 'Fill in the blanks',
     mediumDesc: 'Pick the letters',
     hardDesc: 'Type the name',
   },
 
   lockedTitle: 'Locked!',
-  lockedMedium: 'Finish Easy to wake me up!',
+  lockedFill: 'Finish Easy to wake me up!',
+  lockedMedium: 'Finish Fill-in to wake me up!',
   lockedHard: 'Finish Medium to wake me up!',
 
   progress: '{done} / {total} mastered',
   flagsLeft: '{n} more to go',
 
   whatIsThisFlag: 'What is this flag?',
+  fillTheBlanks: 'Fill in the missing letters',
   spellTheCountry: 'Spell the country',
   typeTheCountry: 'Type the country name',
 
@@ -44,6 +48,8 @@ const en = {
   language: 'Language',
   sound: 'Sound',
   includeAll: 'Include all countries',
+  testingMode: 'Testing mode',
+  testingModeDesc: 'Unlock the next level after just 5 countries',
   resetProgress: 'Reset progress',
   resetConfirmTitle: 'Forget all your stamps?',
   resetConfirmDesc: 'This will erase your mastered flags. Are you sure?',

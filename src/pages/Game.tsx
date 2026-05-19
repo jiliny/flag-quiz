@@ -2,10 +2,11 @@ import { useParams, Navigate } from 'react-router-dom';
 import type { LevelKey } from '../data/countries';
 import { useGameStore, isLevelUnlocked } from '../store/gameStore';
 import { EasyRound } from '../rounds/EasyRound';
+import { FillRound } from '../rounds/FillRound';
 import { MediumRound } from '../rounds/MediumRound';
 import { HardRound } from '../rounds/HardRound';
 
-const VALID: LevelKey[] = ['easy', 'medium', 'hard'];
+const VALID: LevelKey[] = ['easy', 'fill', 'medium', 'hard'];
 
 export function Game() {
   const { level } = useParams<{ level: string }>();
@@ -14,10 +15,11 @@ export function Game() {
     return <Navigate to="/" replace />;
   }
   const key = level as LevelKey;
-  if (!isLevelUnlocked(key, mastered, settings.expandedPool)) {
+  if (!isLevelUnlocked(key, mastered, settings.expandedPool, settings.testingMode)) {
     return <Navigate to="/" replace />;
   }
   if (key === 'easy') return <EasyRound />;
+  if (key === 'fill') return <FillRound />;
   if (key === 'medium') return <MediumRound />;
   return <HardRound />;
 }

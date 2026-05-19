@@ -27,6 +27,7 @@ export function AnswerBoxes({ slots, fixed, highlight = 'idle', size = 'md', onS
         if (fx === ' ') {
           return <div key={`gap-${idx}`} className="w-3 sm:w-4" />;
         }
+        const isFixedLetter = fx !== null && fx !== '' && fx !== ' ';
         const isFilled = ch !== null && ch !== '';
         const display = fx ?? ch ?? '';
         const interactive = !fx && onSlotClick && isFilled;
@@ -38,11 +39,15 @@ export function AnswerBoxes({ slots, fixed, highlight = 'idle', size = 'md', onS
             onClick={() => interactive && onSlotClick?.(idx)}
             className={clsx(
               'no-select rounded-2xl flex items-end justify-center pb-1 font-bold border-[3px]',
-              'bg-white shadow-button transition-colors',
+              'shadow-button transition-colors',
               cellBase,
-              isFilled ? 'border-ink/30' : 'border-dashed border-ink/25',
-              highlight === 'correct' && 'bg-mint-soft border-mint-deep text-mint-deep',
-              highlight === 'wrong' && 'bg-candy-soft border-candy-deep text-candy-deep',
+              isFixedLetter
+                ? 'bg-sky-soft/60 border-sky-deep/40 text-ink/80'
+                : isFilled
+                  ? 'bg-white border-ink/30'
+                  : 'bg-white border-dashed border-ink/25',
+              highlight === 'correct' && !isFixedLetter && 'bg-mint-soft border-mint-deep text-mint-deep',
+              highlight === 'wrong' && !isFixedLetter && 'bg-candy-soft border-candy-deep text-candy-deep',
               interactive ? 'cursor-pointer' : 'cursor-default',
             )}
           >

@@ -21,6 +21,13 @@ const palette = {
     color: 'sky' as const,
     icon: '☁️',
   },
+  fill: {
+    border: 'border-candy-deep',
+    body: 'bg-candy-soft',
+    head: 'bg-candy-main text-white',
+    color: 'candy' as const,
+    icon: '✏️',
+  },
   medium: {
     border: 'border-mint-deep',
     body: 'bg-mint-soft',
@@ -41,7 +48,13 @@ export function LevelTile({ level, unlocked, done, total }: Props) {
   const t = useT();
   const p = palette[level];
   const lockedCaption =
-    level === 'medium' ? t('lockedMedium') : level === 'hard' ? t('lockedHard') : '';
+    level === 'fill'
+      ? t('lockedFill')
+      : level === 'medium'
+        ? t('lockedMedium')
+        : level === 'hard'
+          ? t('lockedHard')
+          : '';
   const inner = (
     <motion.div
       whileTap={unlocked ? { y: 4, scale: 0.98 } : { rotate: [0, -2, 2, -1, 1, 0] }}

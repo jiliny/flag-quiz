@@ -17,6 +17,7 @@ interface Props {
 
 const palette = {
   easy: { head: 'bg-sky-main', stripe: 'text-sky-deep' },
+  fill: { head: 'bg-candy-main', stripe: 'text-candy-deep' },
   medium: { head: 'bg-mint-main', stripe: 'text-mint-deep' },
   hard: { head: 'bg-sun-main', stripe: 'text-sun-deep' },
 };

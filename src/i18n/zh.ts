@@ -14,21 +14,25 @@ const zh: Dict = {
 
   levels: {
     easy: '简单',
+    fill: '填空',
     medium: '中等',
     hard: '困难',
     easyDesc: '点选正确的名字',
+    fillDesc: '填上缺少的字',
     mediumDesc: '选字母拼出名字',
     hardDesc: '自己输入名字',
   },
 
   lockedTitle: '还没解锁哦！',
-  lockedMedium: '通关「简单」后我就醒啦！',
+  lockedFill: '通关「简单」后我就醒啦！',
+  lockedMedium: '通关「填空」后我就醒啦！',
   lockedHard: '通关「中等」后我就醒啦！',
 
   progress: '已认识 {done} / {total}',
   flagsLeft: '还差 {n} 个',
 
   whatIsThisFlag: '这是哪个国家的国旗？',
+  fillTheBlanks: '填上缺少的字母',
   spellTheCountry: '拼出国家名字',
   typeTheCountry: '请输入国家名字',
 
@@ -46,6 +50,8 @@ const zh: Dict = {
   language: '语言',
   sound: '声音',
   includeAll: '包含所有国家',
+  testingMode: '测试模式',
+  testingModeDesc: '只需答对 5 个国家就解锁下一关',
   resetProgress: '重置进度',
   resetConfirmTitle: '要清除全部小印章吗？',
   resetConfirmDesc: '这会清除你已经认识的国旗。确定要继续吗？',

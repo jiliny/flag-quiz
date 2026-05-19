@@ -11,7 +11,9 @@ export function Home() {
   const { mastered, settings, setLang } = useGameStore();
   const expanded = settings.expandedPool;
 
+  const testing = settings.testingMode;
   const easy = levelProgress('easy', mastered, expanded);
+  const fill = levelProgress('fill', mastered, expanded);
   const medium = levelProgress('medium', mastered, expanded);
   const hard = levelProgress('hard', mastered, expanded);
 
@@ -54,19 +56,25 @@ export function Home() {
       <div className="flex flex-col gap-4 mt-3">
         <LevelTile
           level="easy"
-          unlocked={isLevelUnlocked('easy', mastered, expanded)}
+          unlocked={isLevelUnlocked('easy', mastered, expanded, testing)}
           done={easy.done}
           total={easy.total}
         />
         <LevelTile
+          level="fill"
+          unlocked={isLevelUnlocked('fill', mastered, expanded, testing)}
+          done={fill.done}
+          total={fill.total}
+        />
+        <LevelTile
           level="medium"
-          unlocked={isLevelUnlocked('medium', mastered, expanded)}
+          unlocked={isLevelUnlocked('medium', mastered, expanded, testing)}
           done={medium.done}
           total={medium.total}
         />
         <LevelTile
           level="hard"
-          unlocked={isLevelUnlocked('hard', mastered, expanded)}
+          unlocked={isLevelUnlocked('hard', mastered, expanded, testing)}
           done={hard.done}
           total={hard.total}
         />

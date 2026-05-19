@@ -1,4 +1,4 @@
-export type LevelKey = 'easy' | 'medium' | 'hard';
+export type LevelKey = 'easy' | 'fill' | 'medium' | 'hard';
 export type Lang = 'en' | 'zh';
 
 export interface Country {
@@ -6,13 +6,16 @@ export interface Country {
   name: { en: string; zh: string };
   /** 3 short kid-friendly facts per language. Cycled when the kid gets the answer wrong. */
   hints: { en: string[]; zh: string[] };
-  pools: { easy: boolean; medium: boolean; hard: boolean };
+  pools: { easy: boolean; fill: boolean; medium: boolean; hard: boolean };
 }
 
 type Seed = Omit<Country, 'pools'>;
 
 function withAllPools(seeds: Seed[]): Country[] {
-  return seeds.map((c) => ({ ...c, pools: { easy: true, medium: true, hard: true } }));
+  return seeds.map((c) => ({
+    ...c,
+    pools: { easy: true, fill: true, medium: true, hard: true },
+  }));
 }
 
 /**

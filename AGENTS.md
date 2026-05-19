@@ -9,9 +9,9 @@
 ## 1. TL;DR
 
 - **What it is.** `flag-quiz` is a kid-friendly Progressive Web App (PWA) that
-  teaches country flags to young kids (~5+). Three difficulty levels, bilingual
-  English / Chinese, offline-capable, no backend, no accounts, progress in
-  `localStorage`.
+  teaches country flags to young kids (~5+). **Four** difficulty levels,
+  bilingual English / Chinese, offline-capable, no backend, no accounts,
+  progress in `localStorage`.
 - **Stack.** React 19 + TypeScript + Vite 8 + Tailwind 3 + Zustand 5 +
   React Router 7 + framer-motion + `flag-icons` + `vite-plugin-pwa`.
 - **Deployed at.** https://jiliny.github.io/flag-quiz/ — auto-deployed from
@@ -73,6 +73,7 @@ flag-quiz/
 │   │
 │   ├── rounds/
 │   │   ├── EasyRound.tsx          # 4-choice tap
+│   │   ├── FillRound.tsx          # ★ partial-name with blanks, keyboard input
 │   │   ├── MediumRound.tsx        # letter/char tile picker
 │   │   └── HardRound.tsx          # full type-in with on-screen keyboard
 │   │
@@ -89,9 +90,10 @@ flag-quiz/
 └── README.md                      # user-facing setup
 ```
 
-The two ★ files are the highest-touch ones — the **hint card** and the
-**fixed-aspect FlagCard** were added late and changed the round mechanics
-significantly. Read them before editing rounds.
+The three ★ files are the highest-touch ones — the **hint card**, the
+**fixed-aspect FlagCard**, and the **Fill round** (latest addition; sits
+between Easy and Medium and changed the unlock chain). Read them before
+editing rounds.
 
 ---
 
@@ -104,7 +106,7 @@ interface Country {
   code: string;                     // ISO-3166 alpha-2, lowercase, e.g. 'us'
   name: { en: string; zh: string };
   hints: { en: string[]; zh: string[] };  // exactly 3 short kid-friendly hints
-  pools: { easy: boolean; medium: boolean; hard: boolean };
+  pools: { easy: boolean; fill: boolean; medium: boolean; hard: boolean };
 }
 ```
 
@@ -126,32 +128,48 @@ imported once in `src/index.css`). Vite only bundles flags actually referenced.
 ## 4. State management — `src/store/gameStore.ts`
 
 A single Zustand store, persisted via `zustand/middleware/persist` to
-`localStorage` key **`flag-quiz-state-v1`**.
+`localStorage` key **`flag-quiz-state-v1`** (currently `version: 2`).
 
 ```ts
 {
-  mastered: { easy: string[], medium: string[], hard: string[] }, // ISO codes
-  settings: { lang: 'en'|'zh', sound: boolean, expandedPool: boolean },
+  mastered: { easy: string[], fill: string[], medium: string[], hard: string[] }, // ISO codes
+  settings: {
+    lang: 'en' | 'zh',
+    sound: boolean,
+    expandedPool: boolean,
+    testingMode: boolean   // unlock at TESTING_UNLOCK_COUNT instead of full pool
+  },
   recentlySeen: string[]   // rolling window of last 40 codes, any level
 }
 ```
 
 Actions: `markCorrect(level, code)`, `markSeen(code)`, `setLang`, `setSound`,
-`setExpandedPool`, `reset`.
+`setExpandedPool`, `setTestingMode`, `reset`.
 
-Two derived helpers (NOT in the store; pure functions over a snapshot):
+Helpers exported alongside the store (pure functions over a snapshot):
 
 - `poolFor(level, expanded)` — filters the active pool by `c.pools[level]`.
-- `isLevelUnlocked(level, mastered, expanded)` — Easy is always unlocked;
-  Medium unlocks when **every** Easy-pool country is in `mastered.easy`;
-  Hard unlocks when **every** Medium-pool country is in `mastered.medium`.
+- `previousLevel(level)` — the prior level in the chain (Easy → Fill →
+  Medium → Hard). Returns `null` for Easy.
+- `isLevelUnlocked(level, mastered, expanded, testingMode = false)` — Easy is
+  always unlocked; each later level unlocks when **every** country in the
+  previous level's pool has been mastered. With `testingMode === true`, the
+  threshold drops to `min(TESTING_UNLOCK_COUNT, prevPool.length)` countries
+  (default `TESTING_UNLOCK_COUNT = 5`).
 - `levelProgress(level, mastered, expanded) -> { done, total }` — `done`
   intersects the persisted set with the current pool (handles users
   toggling `expandedPool` mid-progress).
 
-> **Bumping the store schema:** change `version: 1` and add `migrate` in the
-> `persist` config in `gameStore.ts`. Don't silently change the shape — old
-> users will be broken.
+### Store schema migrations
+
+Current version is `2`. A `migrate` function in `persist`'s config handles
+v1 → v2: it preserves existing `easy`/`medium`/`hard` mastered arrays, adds
+an empty `fill` array, and defaults `testingMode` to `false`.
+
+> **Bumping the store schema:** bump `version`, add another `if (version < N)`
+> branch in `migrate`, and write **defensive** code (always assume each
+> previous-version field may be missing). Don't silently change the shape —
+> old users without a migration will lose progress.
 
 ---
 
@@ -182,16 +200,44 @@ All three rounds follow the same flow and live in `src/rounds/`:
 
 ### Per-level specifics
 
-| Round  | Input                                  | Wrong UX                                                                |
-| ------ | -------------------------------------- | ----------------------------------------------------------------------- |
-| Easy   | 1 correct + 3 distractor name tiles    | Tapped tile dims + ✗; kid taps a different tile (no clear needed)       |
-| Medium | Letter/char tiles fill ordered slots   | Slots clear after 700 ms; tiles re-enable; hint advances                |
-| Hard   | On-screen keyboard fills slots         | Slots clear after 800 ms; keyboard re-enables; hint advances            |
+| Round  | Input                                    | Wrong UX                                                                |
+| ------ | ---------------------------------------- | ----------------------------------------------------------------------- |
+| Easy   | 1 correct + 3 distractor name tiles      | Tapped tile dims + ✗; kid taps a different tile (no clear needed)       |
+| Fill   | Mostly-revealed name + 1–4 blanks; QWERTY (en) or 18-cell char grid (zh) fills the blanks | Blank slots clear after 700 ms; keyboard re-enables; hint advances |
+| Medium | Letter/char tiles fill ordered slots     | Slots clear after 700 ms; tiles re-enable; hint advances                |
+| Hard   | On-screen keyboard fills slots           | Slots clear after 800 ms; keyboard re-enables; hint advances            |
 
 The Medium tile bank size is `max(12, targetChars + 4)` for `en` and
 `max(12, chars + 8)` for `zh`. The Hard `zh` keyboard uses a 36-cell char
 grid built from the answer chars + decoys sampled from other countries'
 Chinese names (see `buildHardSetup` in `HardRound.tsx`).
+
+### Fill round — blank rules (see `blanksForLength` and `pickBlankIndices`
+in `src/lib/quiz.ts`)
+
+For a name with `N` blank-able positions (Latin letters for `en`, CJK chars
+for `zh`):
+
+| Lang | N range | Blanks |
+| ---- | ------- | ------ |
+| en   | 1–4     | 1      |
+| en   | 5–7     | 2      |
+| en   | 8–11    | 3      |
+| en   | 12+     | 4      |
+| zh   | 1–4     | 1      |
+| zh   | 5+      | 2      |
+
+Position-selection rules (in `pickBlankIndices`):
+- **English: never blank the first letter** — kids need a visual anchor.
+  (This rule does **not** apply to Chinese; for `zh` we want even the leading
+  character to be in play, so `_国` is a valid puzzle and exercises the kid's
+  knowledge of the meaningful first character.)
+- Never blank spaces or punctuation (`predicate` controls what's eligible).
+- **Greedy non-adjacent placement** — shuffle candidates, then accept each
+  only if no already-picked blank is within 1 position. Fall back to closer
+  picks only if the string is too dense to satisfy the constraint.
+- Layout is fresh per round but stable across retries (state is in
+  `useState`'s init for the round; not regenerated on wrong answer).
 
 ---
 
@@ -359,12 +405,28 @@ the persisted ID in users' `localStorage`.
 ### Adjust difficulty
 
 - **Easier Easy:** lower the option count from `buildEasyOptions(pool, answer, 4)`.
+- **Easier Fill:** tweak `blanksForLength` in `lib/quiz.ts` — drop the count
+  per length bucket (e.g. `1–7 → 1` instead of `5–7 → 2`).
+- **Harder Fill:** raise `blanksForLength`, or relax the
+  "no first-letter blank for en" rule in `pickBlankIndices`.
 - **Harder Medium:** increase the decoy tile count in `buildSlotting`
   (`totalTiles = Math.max(12, targetCount + N)` — bump `N`).
 - **Different unlock rule:** edit `isLevelUnlocked` in `gameStore.ts`. Today
-  it's "100% of previous pool"; you could make it "80%" with a threshold.
+  it's "100% of previous pool" (or `TESTING_UNLOCK_COUNT` when testing mode
+  is on). You could make the production threshold "80%" by changing the
+  `prevPool.every(...)` branch.
 - **Different repetition:** edit `pickNext` in `lib/quiz.ts`. The
   `recentlySeen` window is 40 (`markSeen`); shrink for more variety on small pools.
+
+### Use testing mode while developing
+
+Settings → "Testing mode" (a 🧪 toggle). When on, each level unlocks after
+just **5** countries instead of the whole pool. The threshold is the
+constant `TESTING_UNLOCK_COUNT` in `gameStore.ts` — change it there.
+
+This is purely a developer/QA convenience; it's wired to localStorage like
+any other setting, so it persists per device. Leave it OFF for the real
+play experience.
 
 ### Change Globie's look
 
@@ -453,24 +515,30 @@ after one online load.
 
 ## 15. Quick-reference: where things live
 
-| I want to change…                | Edit…                                              |
-| -------------------------------- | -------------------------------------------------- |
-| The country list / hints         | `src/data/countries.ts`                            |
-| App text / labels                | `src/i18n/en.ts` + `src/i18n/zh.ts`                |
-| Unlock rules                     | `isLevelUnlocked` in `src/store/gameStore.ts`      |
-| Easy distractor count            | `buildEasyOptions(...)` call in `EasyRound.tsx`    |
-| Medium tile decoy count          | `buildSlotting(...)` in `MediumRound.tsx`          |
-| Hard `zh` keyboard grid          | `buildHardSetup(...)` in `HardRound.tsx`           |
-| Hint cycle behaviour             | `currentHint` lines in each round file             |
-| Flag size / aspect               | `sizeMap` in `src/components/FlagCard.tsx`         |
-| Mascot look / moods              | `src/components/Globie.tsx`                        |
-| Colours, shadows, animations     | `tailwind.config.js`                               |
-| Custom utilities (`no-select`)   | `src/index.css`                                    |
-| PWA manifest                     | `vite.config.ts` (the `VitePWA({ manifest })`)     |
-| Deploy / CI                      | `.github/workflows/deploy.yml`                     |
-| Repo base path                   | `BASE` in `vite.config.ts`                         |
-| SPA 404 fallback                 | `scripts/spa-404.mjs` (don't remove)               |
+| I want to change…                | Edit…                                                                  |
+| -------------------------------- | ---------------------------------------------------------------------- |
+| The country list / hints         | `src/data/countries.ts`                                                |
+| App text / labels                | `src/i18n/en.ts` + `src/i18n/zh.ts`                                    |
+| Unlock rules                     | `isLevelUnlocked` + `previousLevel` in `src/store/gameStore.ts`        |
+| Testing-mode threshold (default 5) | `TESTING_UNLOCK_COUNT` in `src/store/gameStore.ts`                   |
+| Easy distractor count            | `buildEasyOptions(...)` call in `EasyRound.tsx`                        |
+| Fill blank counts                | `blanksForLength(...)` in `src/lib/quiz.ts`                            |
+| Fill blank placement rules       | `pickBlankIndices(...)` in `src/lib/quiz.ts`                           |
+| Medium tile decoy count          | `buildSlotting(...)` in `MediumRound.tsx`                              |
+| Hard `zh` keyboard grid          | `buildHardSetup(...)` in `HardRound.tsx`                               |
+| Fill `zh` keyboard grid          | `buildFillSetup(...)` in `FillRound.tsx`                               |
+| Hint cycle behaviour             | `currentHint` lines in each round file                                 |
+| Flag size / aspect               | `sizeMap` in `src/components/FlagCard.tsx`                             |
+| Mascot look / moods              | `src/components/Globie.tsx`                                            |
+| Level tile / round palette       | `palette` map in `LevelTile.tsx` + `RoundShell.tsx`                    |
+| Fixed-letter slot styling (Fill) | `isFixedLetter` branch in `src/components/AnswerBoxes.tsx`             |
+| Colours, shadows, animations     | `tailwind.config.js`                                                   |
+| Custom utilities (`no-select`)   | `src/index.css`                                                        |
+| PWA manifest                     | `vite.config.ts` (the `VitePWA({ manifest })`)                         |
+| Deploy / CI                      | `.github/workflows/deploy.yml`                                         |
+| Repo base path                   | `BASE` in `vite.config.ts`                                             |
+| SPA 404 fallback                 | `scripts/spa-404.mjs` (don't remove)                                   |
 
 ---
 
-_Last updated: 2026-05-17 (initial public release on GitHub Pages)._
+_Last updated: 2026-05-18 (Fill level + testing mode)._

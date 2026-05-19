@@ -82,5 +82,71 @@ export function answerSlotCount(answer: string, lang: 'en' | 'zh'): number {
 }
 
 export function levelOrder(): LevelKey[] {
-  return ['easy', 'medium', 'hard'];
+  return ['easy', 'fill', 'medium', 'hard'];
+}
+
+/**
+ * How many positions to blank out for the Fill round, given the count of
+ * blank-able characters (letters for `en`, characters for `zh`) in the
+ * country name. See AGENTS.md §11 for the rationale.
+ */
+export function blanksForLength(n: number, lang: 'en' | 'zh'): number {
+  if (n <= 0) return 0;
+  if (lang === 'en') {
+    if (n <= 4) return 1;
+    if (n <= 7) return 2;
+    if (n <= 11) return 3;
+    return 4;
+  }
+  if (n <= 4) return 1;
+  return 2;
+}
+
+/**
+ * Choose which positions in `letters` to turn into blanks.
+ *
+ * Rules:
+ *  - Only blank-able positions are considered (`predicate(ch) === true`).
+ *  - For `en`, the first blank-able position is reserved (never blanked) when
+ *    we have more candidates than required — gives the kid a starting anchor.
+ *  - We greedy-pick to avoid two adjacent blanks (better phonetic context);
+ *    fall back to closer picks only if necessary.
+ *  - Random within the constraints — each call returns a fresh layout.
+ */
+export function pickBlankIndices(
+  letters: string[],
+  count: number,
+  lang: 'en' | 'zh',
+  predicate: (ch: string) => boolean,
+): Set<number> {
+  if (count <= 0) return new Set();
+  const candidates: number[] = [];
+  for (let i = 0; i < letters.length; i++) {
+    if (predicate(letters[i])) candidates.push(i);
+  }
+  if (candidates.length === 0) return new Set();
+  if (candidates.length <= count) return new Set(candidates);
+
+  // For Latin scripts, reserve the first letter so the kid sees an anchor.
+  let pool = candidates;
+  if (lang === 'en' && candidates.length > count) {
+    pool = candidates.slice(1);
+  }
+
+  // Greedy spaced selection: shuffle then accept if not adjacent to any pick.
+  const shuffled = shuffle([...pool]);
+  const picked: number[] = [];
+  for (const idx of shuffled) {
+    if (picked.length >= count) break;
+    const adjacent = picked.some((p) => Math.abs(p - idx) <= 1);
+    if (!adjacent) picked.push(idx);
+  }
+  // If we didn't fill the quota (string was too dense to keep gaps), relax.
+  if (picked.length < count) {
+    for (const idx of shuffled) {
+      if (picked.length >= count) break;
+      if (!picked.includes(idx)) picked.push(idx);
+    }
+  }
+  return new Set(picked);
 }

@@ -48,7 +48,8 @@ function Toggle({
 
 export function Settings() {
   const t = useT();
-  const { settings, setLang, setSound, setExpandedPool, reset } = useGameStore();
+  const { settings, setLang, setSound, setExpandedPool, setTestingMode, reset } =
+    useGameStore();
   const [confirmReset, setConfirmReset] = useState(false);
 
   return (
@@ -95,6 +96,15 @@ export function Settings() {
         <Row label={t('includeAll')}>
           <Toggle on={settings.expandedPool} onChange={setExpandedPool} labelOn="✓" labelOff="" />
         </Row>
+
+        <RowWithCaption label={t('testingMode')} caption={t('testingModeDesc')}>
+          <Toggle
+            on={settings.testingMode}
+            onChange={setTestingMode}
+            labelOn="🧪"
+            labelOff=""
+          />
+        </RowWithCaption>
       </section>
 
       <button
@@ -155,6 +165,26 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
     <div className="flex items-center justify-between gap-4">
       <div className="text-xl font-semibold">{label}</div>
       <div>{children}</div>
+    </div>
+  );
+}
+
+function RowWithCaption({
+  label,
+  caption,
+  children,
+}: {
+  label: string;
+  caption: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col">
+        <div className="text-xl font-semibold">{label}</div>
+        <div className="text-sm text-ink/60">{caption}</div>
+      </div>
+      <div className="shrink-0">{children}</div>
     </div>
   );
 }
