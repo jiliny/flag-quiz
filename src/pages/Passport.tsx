@@ -6,6 +6,7 @@ import { useGameStore, STAMP_CATALOG } from '../store/gameStore';
 import { getActivePool } from '../data/countries';
 import { useLang, useT } from '../i18n';
 import { FlagCard } from '../components/FlagCard';
+import { Icons } from '../components/Icons';
 import { audio } from '../lib/audio';
 
 export function Passport() {
@@ -42,17 +43,18 @@ export function Passport() {
       <header className="flex items-center justify-between">
         <Link
           to="/"
-          className="rounded-pill bg-white border-2 border-ink/10 px-4 py-2 font-semibold shadow-button"
+          className="rounded-pill bg-white border-2 border-ink/10 px-4 py-2 font-semibold shadow-button flex items-center gap-1.5 transition-transform active:scale-95"
         >
-          ← {t('back')}
+          <Icons.BackArrow size={16} className="text-ink shrink-0" />
+          <span>{t('back')}</span>
         </Link>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <span aria-hidden>🛂</span>
+          <Icons.Passport size={28} className="shrink-0 animate-[wobble_5s_ease-in-out_infinite]" />
           <span className="hidden sm:inline">{t('passport')}</span>
         </h1>
         <div className="flex items-center gap-3">
           <div className="rounded-pill bg-white border-2 border-ink/10 px-3 py-1.5 font-bold text-sm sm:text-base flex items-center gap-1 shadow-button select-none">
-            <span aria-hidden>🪙</span>
+            <Icons.Coin size={18} className="shrink-0" />
             <span>{coins}</span>
           </div>
           <div className="text-base font-semibold text-ink/70 bg-ink/5 px-3 py-1.5 rounded-full select-none">
@@ -156,8 +158,8 @@ export function Passport() {
                 <div className="w-full flex flex-col gap-2 border-t-2 border-ink/5 pt-3">
                   <div className="flex items-center justify-between text-sm font-bold text-ink/60 uppercase tracking-wide px-1">
                     <span>{t('stampThisCountry')}</span>
-                    <span className="text-sun-deep flex items-center gap-0.5 bg-sun-soft/50 px-2 py-0.5 rounded-full select-none">
-                      🪙 {coins}
+                    <span className="text-sun-deep flex items-center gap-1 bg-sun-soft/50 px-2.5 py-1 rounded-full select-none font-extrabold border border-sun-main/20">
+                      <Icons.Coin size={15} className="shrink-0" /> {coins}
                     </span>
                   </div>
                   
@@ -185,17 +187,17 @@ export function Passport() {
                             }
                           }}
                           className={clsx(
-                            'no-select text-2xl w-10 h-10 rounded-xl flex items-center justify-center relative transition-all border-2',
+                            'no-select text-2xl w-11 h-11 rounded-full flex items-center justify-center relative transition-all border-2 shadow-button',
                             isEquipped && 'bg-mint-soft border-mint-deep scale-110 shadow-sticker z-10',
-                            !isEquipped && isUnlocked && 'bg-white border-ink/10 hover:border-ink/20 shadow-button active:translate-y-0.5',
-                            !isUnlocked && 'bg-white/50 border-dashed border-ink/20 opacity-70 hover:opacity-100'
+                            !isEquipped && isUnlocked && 'bg-white border-ink/15 hover:border-ink/25 hover:scale-105 active:translate-y-0.5',
+                            !isUnlocked && 'bg-ink/5 border-dashed border-ink/20 opacity-60 hover:opacity-100 hover:scale-105'
                           )}
                           title={lang === 'en' ? stamp.name.en : stamp.name.zh}
                           aria-label={lang === 'en' ? `Stamp ${stamp.name.en}` : `印章 ${stamp.name.zh}`}
                         >
-                          <span className="select-none">{stamp.emoji}</span>
+                          <span className="select-none leading-none mt-[-1px]">{stamp.emoji}</span>
                           {!isUnlocked && (
-                            <span className="absolute -bottom-1 -right-1 text-[9px] bg-sun-main text-ink border border-sun-deep rounded-full px-1 font-extrabold leading-none scale-90 select-none">
+                            <span className="absolute -bottom-1 -right-1.5 text-[9px] bg-sun-main text-ink border-2 border-ink rounded-full px-1 font-extrabold leading-none scale-75 select-none">
                               {stamp.cost}
                             </span>
                           )}

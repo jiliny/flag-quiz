@@ -5,6 +5,7 @@ import type { LevelKey } from '../data/countries';
 import { useT } from '../i18n';
 import { useGameStore, levelProgress } from '../store/gameStore';
 import { Globie, type GlobieMood } from './Globie';
+import { Icons } from './Icons';
 
 interface Props {
   level: LevelKey;
@@ -33,10 +34,10 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
       <div className={clsx('safe-pt px-4 py-3 text-white flex items-center justify-between', p.head)}>
         <Link
           to="/"
-          className="rounded-pill bg-white/20 hover:bg-white/30 px-4 py-2 text-white font-semibold flex items-center gap-2"
+          className="rounded-pill bg-white/20 hover:bg-white/30 px-4 py-2 text-white font-semibold flex items-center gap-1.5 transition-transform active:scale-95"
           aria-label={t('back')}
         >
-          <span aria-hidden>←</span>
+          <Icons.BackArrow size={16} className="shrink-0" />
           <span className="hidden sm:inline">{t('back')}</span>
         </Link>
         <div className="font-bold text-lg">
@@ -44,16 +45,20 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
         </div>
         <div className="flex items-center gap-2">
           <div className="rounded-pill bg-white/20 px-3 py-1.5 font-bold text-sm sm:text-base flex items-center gap-1 select-none">
-            <span aria-hidden>🪙</span>
+            <Icons.Coin size={18} className="shrink-0" />
             <span>{coins}</span>
           </div>
           <button
             type="button"
             onClick={() => setSound(!settings.sound)}
-            className="rounded-pill bg-white/20 hover:bg-white/30 px-4 py-2 text-white text-xl"
+            className="rounded-full bg-white/20 hover:bg-white/30 w-10 h-10 flex items-center justify-center text-white transition-transform active:scale-90"
             aria-label={t('sound')}
           >
-            {settings.sound ? '🔊' : '🔇'}
+            {settings.sound ? (
+              <Icons.VolumeUp size={22} className="shrink-0" />
+            ) : (
+              <Icons.VolumeMute size={22} className="shrink-0" />
+            )}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useGameStore, isLevelUnlocked, levelProgress } from '../store/gameStore';
 import { LevelTile } from '../components/LevelTile';
 import { Globie } from '../components/Globie';
+import { Icons } from '../components/Icons';
 import { useT } from '../i18n';
 import { audio } from '../lib/audio';
 
@@ -45,10 +46,10 @@ export function Home() {
           </button>
           <Link
             to="/settings"
-            className="rounded-pill bg-white border-2 border-ink/10 w-11 h-11 flex items-center justify-center text-xl shadow-button"
+            className="rounded-pill bg-white border-2 border-ink/10 w-11 h-11 flex items-center justify-center shadow-button transition-transform duration-300 hover:scale-105 active:scale-95"
             aria-label={t('settings')}
           >
-            ⚙️
+            <Icons.Gear size={24} className="transition-transform duration-500 hover:rotate-90 text-ink" />
           </Link>
         </div>
       </header>
@@ -86,12 +87,12 @@ export function Home() {
       >
         <Link
           to="/passport"
-          className="no-select rounded-pill bg-candy-main text-white font-bold text-xl px-7 py-4 shadow-button border-2 border-candy-deep flex items-center gap-2"
+          className="no-select rounded-pill bg-candy-main text-white font-bold text-xl px-7 py-4 shadow-button border-2 border-candy-deep flex items-center gap-2.5 transition-transform duration-200 hover:scale-103"
         >
-          <span aria-hidden>🛂</span>
+          <Icons.Passport size={26} className="shrink-0" />
           <span>{t('passport')}</span>
-          <span className="text-sun-main font-extrabold flex items-center gap-0.5 ml-1 bg-white/20 px-2 py-0.5 rounded-full text-base border border-white/10 select-none">
-            🪙 {coins}
+          <span className="text-white font-extrabold flex items-center gap-1 ml-1 bg-white/20 px-2.5 py-1 rounded-full text-base border border-white/10 select-none">
+            <Icons.Coin size={18} className="shrink-0" /> {coins}
           </span>
         </Link>
       </motion.div>

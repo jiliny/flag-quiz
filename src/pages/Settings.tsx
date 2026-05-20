@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import { useT } from '../i18n';
 import { Globie } from '../components/Globie';
+import { Icons } from '../components/Icons';
 import { audio } from '../lib/audio';
 
 function Toggle({
@@ -15,8 +16,8 @@ function Toggle({
 }: {
   on: boolean;
   onChange: (v: boolean) => void;
-  labelOn?: string;
-  labelOff?: string;
+  labelOn?: React.ReactNode;
+  labelOff?: React.ReactNode;
 }) {
   return (
     <button
@@ -57,9 +58,10 @@ export function Settings() {
       <header className="flex items-center justify-between">
         <Link
           to="/"
-          className="rounded-pill bg-white border-2 border-ink/10 px-4 py-2 font-semibold shadow-button"
+          className="rounded-pill bg-white border-2 border-ink/10 px-4 py-2 font-semibold shadow-button flex items-center gap-1.5 transition-transform active:scale-95"
         >
-          ← {t('back')}
+          <Icons.BackArrow size={16} className="text-ink shrink-0" />
+          <span>{t('back')}</span>
         </Link>
         <h1 className="text-2xl font-bold">{t('settings')}</h1>
         <div className="w-12" aria-hidden />
@@ -90,7 +92,12 @@ export function Settings() {
         </Row>
 
         <Row label={t('sound')}>
-          <Toggle on={settings.sound} onChange={setSound} labelOn="🔊" labelOff="🔇" />
+          <Toggle
+            on={settings.sound}
+            onChange={setSound}
+            labelOn={<Icons.VolumeUp size={18} className="text-ink shrink-0" />}
+            labelOff={<Icons.VolumeMute size={18} className="text-ink shrink-0" />}
+          />
         </Row>
 
         <Row label={t('includeAll')}>
@@ -101,7 +108,7 @@ export function Settings() {
           <Toggle
             on={settings.testingMode}
             onChange={setTestingMode}
-            labelOn="🧪"
+            labelOn={<Icons.Flask size={20} className="text-ink shrink-0" />}
             labelOff=""
           />
         </RowWithCaption>
