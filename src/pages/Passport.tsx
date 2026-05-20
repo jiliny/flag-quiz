@@ -2,21 +2,35 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
-import { useGameStore } from '../store/gameStore';
+import { useGameStore, STAMP_CATALOG } from '../store/gameStore';
 import { getActivePool } from '../data/countries';
 import { useLang, useT } from '../i18n';
 import { FlagCard } from '../components/FlagCard';
+import { audio } from '../lib/audio';
 
 export function Passport() {
   const t = useT();
   const lang = useLang();
-  const { mastered, settings } = useGameStore();
+  const {
+    mastered,
+    settings,
+    coins = 0,
+    unlockedStamps = ['⭐'],
+    countryStamps = {},
+    buyStamp,
+    setCountryStamp,
+  } = useGameStore();
+
   const pool = getActivePool(settings.expandedPool);
+  
+  // Include easy, fill, medium, and hard mastered countries
   const masteredAny = new Set<string>([
     ...mastered.easy,
+    ...mastered.fill,
     ...mastered.medium,
     ...mastered.hard,
   ]);
+
   const [selected, setSelected] = useState<string | null>(null);
 
   const total = pool.length;
@@ -34,10 +48,16 @@ export function Passport() {
         </Link>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <span aria-hidden>🛂</span>
-          {t('passport')}
+          <span className="hidden sm:inline">{t('passport')}</span>
         </h1>
-        <div className="text-base font-semibold text-ink/70">
-          {done} / {total}
+        <div className="flex items-center gap-3">
+          <div className="rounded-pill bg-white border-2 border-ink/10 px-3 py-1.5 font-bold text-sm sm:text-base flex items-center gap-1 shadow-button select-none">
+            <span aria-hidden>🪙</span>
+            <span>{coins}</span>
+          </div>
+          <div className="text-base font-semibold text-ink/70 bg-ink/5 px-3 py-1.5 rounded-full select-none">
+            {done} / {total}
+          </div>
         </div>
       </header>
 
@@ -73,10 +93,10 @@ export function Passport() {
                   initial={{ scale: 0, rotate: -20 }}
                   animate={{ scale: 1, rotate: 10 }}
                   transition={{ type: 'spring', stiffness: 240, damping: 14 }}
-                  className="absolute -top-2 -right-2 text-2xl"
+                  className="absolute -top-2 -right-2 text-2xl select-none"
                   aria-hidden
                 >
-                  ⭐
+                  {countryStamps[c.code] || '⭐'}
                 </motion.span>
               )}
             </button>
@@ -101,10 +121,26 @@ export function Passport() {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-xl2 border-4 border-ink/10 shadow-sticker p-6 max-w-sm w-full flex flex-col items-center gap-3"
             >
-              <FlagCard code={selectedCountry.code} size="md" wobble={false} />
+              <div className="relative">
+                <FlagCard code={selectedCountry.code} size="md" wobble={false} />
+                {masteredAny.has(selectedCountry.code) && (
+                  <motion.span
+                    key={countryStamps[selectedCountry.code] || '⭐'}
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 10 }}
+                    transition={{ type: 'spring', stiffness: 240, damping: 14 }}
+                    className="absolute -top-2 -right-2 text-3xl select-none"
+                    aria-hidden
+                  >
+                    {countryStamps[selectedCountry.code] || '⭐'}
+                  </motion.span>
+                )}
+              </div>
+              
               <div className="text-2xl font-bold text-center">
                 {masteredAny.has(selectedCountry.code) ? selectedCountry.name[lang] : '???'}
               </div>
+              
               <div className="text-base text-ink/60 text-center">
                 {masteredAny.has(selectedCountry.code) ? (
                   <>
@@ -115,6 +151,61 @@ export function Passport() {
                   t('empty')
                 )}
               </div>
+
+              {masteredAny.has(selectedCountry.code) && (
+                <div className="w-full flex flex-col gap-2 border-t-2 border-ink/5 pt-3">
+                  <div className="flex items-center justify-between text-sm font-bold text-ink/60 uppercase tracking-wide px-1">
+                    <span>{t('stampThisCountry')}</span>
+                    <span className="text-sun-deep flex items-center gap-0.5 bg-sun-soft/50 px-2 py-0.5 rounded-full select-none">
+                      🪙 {coins}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-5 gap-2 max-h-36 overflow-y-auto p-1 bg-ink/5 rounded-xl border border-ink/10">
+                    {STAMP_CATALOG.map((stamp) => {
+                      const isUnlocked = unlockedStamps.includes(stamp.emoji);
+                      const isEquipped = (countryStamps[selectedCountry.code] || '⭐') === stamp.emoji;
+                      
+                      return (
+                        <button
+                          key={stamp.emoji}
+                          type="button"
+                          onClick={() => {
+                            if (isUnlocked) {
+                              audio.stamp();
+                              setCountryStamp(selectedCountry.code, stamp.emoji);
+                            } else {
+                              if (coins >= stamp.cost) {
+                                audio.unlock();
+                                buyStamp(stamp.emoji, stamp.cost);
+                                setCountryStamp(selectedCountry.code, stamp.emoji);
+                              } else {
+                                audio.wrong();
+                              }
+                            }
+                          }}
+                          className={clsx(
+                            'no-select text-2xl w-10 h-10 rounded-xl flex items-center justify-center relative transition-all border-2',
+                            isEquipped && 'bg-mint-soft border-mint-deep scale-110 shadow-sticker z-10',
+                            !isEquipped && isUnlocked && 'bg-white border-ink/10 hover:border-ink/20 shadow-button active:translate-y-0.5',
+                            !isUnlocked && 'bg-white/50 border-dashed border-ink/20 opacity-70 hover:opacity-100'
+                          )}
+                          title={lang === 'en' ? stamp.name.en : stamp.name.zh}
+                          aria-label={lang === 'en' ? `Stamp ${stamp.name.en}` : `印章 ${stamp.name.zh}`}
+                        >
+                          <span className="select-none">{stamp.emoji}</span>
+                          {!isUnlocked && (
+                            <span className="absolute -bottom-1 -right-1 text-[9px] bg-sun-main text-ink border border-sun-deep rounded-full px-1 font-extrabold leading-none scale-90 select-none">
+                              {stamp.cost}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={() => setSelected(null)}

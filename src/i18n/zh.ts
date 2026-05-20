@@ -67,6 +67,9 @@ const zh: Dict = {
   submit: '检查',
   backspace: '退格',
   space: '空格',
+  coins: '金币',
+  stampThisCountry: '选择一个小印章！',
+  unlockStamp: '{cost} 🪙 解锁',
 };
 
 export default zh;

@@ -24,7 +24,7 @@ const palette = {
 
 export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood, bannerText }: Props) {
   const t = useT();
-  const { mastered, settings, setSound } = useGameStore();
+  const { mastered, settings, setSound, coins = 0 } = useGameStore();
   const prog = levelProgress(level, mastered, settings.expandedPool);
   const p = palette[level];
 
@@ -42,14 +42,20 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
         <div className="font-bold text-lg">
           {t(`levels.${level}` as const)} · {prog.done} / {prog.total}
         </div>
-        <button
-          type="button"
-          onClick={() => setSound(!settings.sound)}
-          className="rounded-pill bg-white/20 hover:bg-white/30 px-4 py-2 text-white text-xl"
-          aria-label={t('sound')}
-        >
-          {settings.sound ? '🔊' : '🔇'}
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="rounded-pill bg-white/20 px-3 py-1.5 font-bold text-sm sm:text-base flex items-center gap-1 select-none">
+            <span aria-hidden>🪙</span>
+            <span>{coins}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSound(!settings.sound)}
+            className="rounded-pill bg-white/20 hover:bg-white/30 px-4 py-2 text-white text-xl"
+            aria-label={t('sound')}
+          >
+            {settings.sound ? '🔊' : '🔇'}
+          </button>
+        </div>
       </div>
 
       <main className="flex-1 px-4 pt-4 pb-6 mx-auto w-full max-w-3xl flex flex-col items-center gap-5">

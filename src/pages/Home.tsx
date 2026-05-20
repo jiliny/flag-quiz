@@ -8,7 +8,7 @@ import { audio } from '../lib/audio';
 
 export function Home() {
   const t = useT();
-  const { mastered, settings, setLang } = useGameStore();
+  const { mastered, settings, setLang, coins = 0 } = useGameStore();
   const expanded = settings.expandedPool;
 
   const testing = settings.testingMode;
@@ -89,7 +89,10 @@ export function Home() {
           className="no-select rounded-pill bg-candy-main text-white font-bold text-xl px-7 py-4 shadow-button border-2 border-candy-deep flex items-center gap-2"
         >
           <span aria-hidden>🛂</span>
-          {t('passport')}
+          <span>{t('passport')}</span>
+          <span className="text-sun-main font-extrabold flex items-center gap-0.5 ml-1 bg-white/20 px-2 py-0.5 rounded-full text-base border border-white/10 select-none">
+            🪙 {coins}
+          </span>
         </Link>
       </motion.div>
     </div>

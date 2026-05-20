@@ -65,6 +65,9 @@ const en = {
   submit: 'Check',
   backspace: 'Erase',
   space: 'Space',
+  coins: 'Coins',
+  stampThisCountry: 'Choose a Stamp!',
+  unlockStamp: 'Unlock for {cost} 🪙',
 };
 
 export type Dict = typeof en;

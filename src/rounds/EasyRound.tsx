@@ -11,7 +11,7 @@ import { HintCard } from '../components/HintCard';
 import { celebrateAt } from '../components/Celebrate';
 import { audio } from '../lib/audio';
 
-type Phase = 'asking' | 'correct';
+type Phase = 'asking' | 'cooldown' | 'correct';
 
 export function EasyRound() {
   const t = useT();
@@ -63,12 +63,21 @@ export function EasyRound() {
       audio.wrong();
       setShakingCode(c.code);
       setWrongCodes(new Set([...wrongCodes, c.code]));
+      setPhase('cooldown');
       setTimeout(() => setShakingCode(null), 280);
+      setTimeout(() => {
+        setPhase('asking');
+      }, 1500); // 1.5s visual pause to discourage rapid guessing
     }
   };
 
-  const bannerText = phase === 'correct' ? `${t('yay')} 🎉` : undefined;
-  const bannerMood = phase === 'correct' ? 'happy' : 'idle';
+  const bannerText =
+    phase === 'correct'
+      ? `${t('yay')} 🎉`
+      : phase === 'cooldown'
+      ? `${t('tryAgain')} 🧐`
+      : undefined;
+  const bannerMood = phase === 'correct' ? 'happy' : phase === 'cooldown' ? 'oops' : 'idle';
 
   return (
     <RoundShell
@@ -85,6 +94,8 @@ export function EasyRound() {
               const isWrong = wrongCodes.has(c.code);
               const showCorrectHighlight = phase === 'correct' && isCorrect;
               const isShaking = shakingCode === c.code;
+              const isInactive = phase === 'cooldown' && !isWrong;
+
               return (
                 <motion.button
                   key={c.code}
@@ -98,6 +109,7 @@ export function EasyRound() {
                     showCorrectHighlight && 'bg-mint-soft border-mint-deep text-mint-deep',
                     isWrong && 'bg-candy-soft/60 border-candy-deep/40 text-candy-deep/70 opacity-60',
                     isShaking && 'animate-shake',
+                    isInactive && 'opacity-70 pointer-events-none',
                   )}
                   disabled={phase !== 'asking' || isWrong}
                 >

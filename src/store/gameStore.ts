@@ -18,26 +18,61 @@ export interface AppSettings {
   testingMode: boolean;
 }
 
+export interface Stamp {
+  emoji: string;
+  cost: number;
+  name: { en: string; zh: string };
+}
+
+export const STAMP_CATALOG: Stamp[] = [
+  { emoji: '⭐', cost: 0, name: { en: 'Star', zh: '星星' } },
+  { emoji: '🎈', cost: 5, name: { en: 'Balloon', zh: '气球' } },
+  { emoji: '🍕', cost: 10, name: { en: 'Pizza', zh: '披萨' } },
+  { emoji: '🦁', cost: 15, name: { en: 'Lion', zh: '狮子' } },
+  { emoji: '🐼', cost: 15, name: { en: 'Panda', zh: '熊猫' } },
+  { emoji: '🦖', cost: 20, name: { en: 'T-Rex', zh: '霸王龙' } },
+  { emoji: '🐳', cost: 25, name: { en: 'Whale', zh: '鲸鱼' } },
+  { emoji: '🦄', cost: 25, name: { en: 'Unicorn', zh: '独角兽' } },
+  { emoji: '🏎️', cost: 30, name: { en: 'Race Car', zh: '赛车' } },
+  { emoji: '🚀', cost: 30, name: { en: 'Rocket', zh: '火箭' } },
+  { emoji: '👑', cost: 50, name: { en: 'Crown', zh: '皇冠' } },
+];
+
 interface State {
   mastered: Mastered;
   settings: AppSettings;
   recentlySeen: string[];
+  coins: number;
+  unlockedStamps: string[];
+  countryStamps: Record<string, string>;
   markCorrect: (level: LevelKey, code: string) => void;
   markSeen: (code: string) => void;
   setLang: (lang: Lang) => void;
   setSound: (v: boolean) => void;
   setExpandedPool: (v: boolean) => void;
   setTestingMode: (v: boolean) => void;
+  buyStamp: (stamp: string, cost: number) => void;
+  setCountryStamp: (code: string, stamp: string) => void;
   reset: () => void;
 }
 
 /** How many countries you need in testing mode to unlock the next level. */
 export const TESTING_UNLOCK_COUNT = 5;
 
-const initial: { mastered: Mastered; settings: AppSettings; recentlySeen: string[] } = {
+const initial: {
+  mastered: Mastered;
+  settings: AppSettings;
+  recentlySeen: string[];
+  coins: number;
+  unlockedStamps: string[];
+  countryStamps: Record<string, string>;
+} = {
   mastered: { easy: [], fill: [], medium: [], hard: [] },
   settings: { lang: 'en', sound: true, expandedPool: false, testingMode: false },
   recentlySeen: [],
+  coins: 0,
+  unlockedStamps: ['⭐'],
+  countryStamps: {},
 };
 
 export const useGameStore = create<State>()(
@@ -46,9 +81,25 @@ export const useGameStore = create<State>()(
       ...initial,
       markCorrect: (level, code) =>
         set((s) => {
-          if (s.mastered[level].includes(code)) return s;
+          const alreadyMastered = s.mastered[level].includes(code);
+          const newMastered = alreadyMastered
+            ? s.mastered[level]
+            : [...s.mastered[level], code];
+
+          // +1/+2/+3/+5 for new masteries, +1 practice coin for repeats
+          const reward = alreadyMastered
+            ? 1
+            : level === 'easy'
+            ? 1
+            : level === 'fill'
+            ? 2
+            : level === 'medium'
+            ? 3
+            : 5;
+
           return {
-            mastered: { ...s.mastered, [level]: [...s.mastered[level], code] },
+            mastered: { ...s.mastered, [level]: newMastered },
+            coins: s.coins + reward,
           };
         }),
       markSeen: (code) =>
@@ -62,38 +113,63 @@ export const useGameStore = create<State>()(
         set((s) => ({ settings: { ...s.settings, expandedPool } })),
       setTestingMode: (testingMode) =>
         set((s) => ({ settings: { ...s.settings, testingMode } })),
+      buyStamp: (stamp, cost) =>
+        set((s) => {
+          if (s.coins < cost) return s;
+          if (s.unlockedStamps.includes(stamp)) return s;
+          return {
+            coins: s.coins - cost,
+            unlockedStamps: [...s.unlockedStamps, stamp],
+          };
+        }),
+      setCountryStamp: (code, stamp) =>
+        set((s) => {
+          if (!s.unlockedStamps.includes(stamp)) return s;
+          return {
+            countryStamps: { ...s.countryStamps, [code]: stamp },
+          };
+        }),
       reset: () => set(() => ({ ...initial })),
     }),
     {
       name: 'flag-quiz-state-v1',
-      version: 2,
-      // v1 -> v2: introduced the Fill level + testingMode setting. Existing
-      // mastered easy/medium/hard arrays are preserved; fill starts empty.
+      version: 3,
+      // Migration:
+      // v1 -> v2: introduced Fill level + testingMode.
+      // v2 -> v3: introduced coins, unlockedStamps, countryStamps.
       migrate: (persisted: unknown, version) => {
         if (!persisted || typeof persisted !== 'object') return persisted as never;
-        const p = persisted as {
-          mastered?: Partial<Mastered>;
-          settings?: Partial<AppSettings>;
-          recentlySeen?: string[];
-        };
+        
+        let data = { ...persisted } as Record<string, any>;
+        
         if (version < 2) {
-          return {
+          data = {
             mastered: {
-              easy: p.mastered?.easy ?? [],
+              easy: data.mastered?.easy ?? [],
               fill: [],
-              medium: p.mastered?.medium ?? [],
-              hard: p.mastered?.hard ?? [],
+              medium: data.mastered?.medium ?? [],
+              hard: data.mastered?.hard ?? [],
             },
             settings: {
-              lang: p.settings?.lang ?? 'en',
-              sound: p.settings?.sound ?? true,
-              expandedPool: p.settings?.expandedPool ?? false,
+              lang: data.settings?.lang ?? 'en',
+              sound: data.settings?.sound ?? true,
+              expandedPool: data.settings?.expandedPool ?? false,
               testingMode: false,
             },
-            recentlySeen: p.recentlySeen ?? [],
+            recentlySeen: data.recentlySeen ?? [],
           };
         }
-        return persisted as never;
+        
+        if (version < 3) {
+          data = {
+            ...data,
+            coins: data.coins ?? 0,
+            unlockedStamps: data.unlockedStamps ?? ['⭐'],
+            countryStamps: data.countryStamps ?? {},
+          };
+        }
+        
+        return data as never;
       },
     },
   ),
