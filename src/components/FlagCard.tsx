@@ -17,7 +17,7 @@ const sizeMap = {
   sm: { width: 96, height: 72, pad: 'p-2', rotate: -2 },
   md: { width: 160, height: 120, pad: 'p-3', rotate: -3 },
   lg: { width: 240, height: 180, pad: 'p-4', rotate: -3 },
-  hero: { width: 320, height: 240, pad: 'p-5', rotate: -3 },
+  hero: { width: 320, height: 240, pad: 'p-4 sm:p-5', rotate: -3 },
 } as const;
 
 export function FlagCard({ code, size = 'hero', wobble = true, className }: Props) {
@@ -32,7 +32,7 @@ export function FlagCard({ code, size = 'hero', wobble = true, className }: Prop
       transition={{ type: 'spring', stiffness: 220, damping: 18 }}
       style={{ maxWidth: '100%', width: outerW }}
       className={clsx(
-        'inline-block bg-white rounded-xl2 shadow-sticker border-[3px] border-ink/10 relative',
+        'inline-block bg-white rounded-xl2 shadow-sticker border-[3px] border-ink/10 relative flag-card-responsive',
         s.pad,
         wobble && 'animate-wobble',
         className,
@@ -43,11 +43,12 @@ export function FlagCard({ code, size = 'hero', wobble = true, className }: Prop
         aria-hidden
       />
       <span
-        className={clsx('block rounded-md overflow-hidden bg-ink/5', `fi-${code}`)}
+        className={clsx('block rounded-md overflow-hidden bg-ink/5 flag-inner', `fi-${code}`)}
         style={{
           width: s.width,
           height: s.height,
           maxWidth: '100%',
+          aspectRatio: '4 / 3',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

@@ -72,3 +72,26 @@ button {
     padding-bottom: max(env(safe-area-inset-bottom), 16px);
   }
 }
+
+/* Scale down the flag card on shorter viewports so the full
+   round layout (header + flag + options + hint) fits on screen. */
+@media (max-height: 700px) {
+  .flag-card-responsive {
+    transform-origin: top center;
+    /* Let the card shrink from its fixed width/height */
+    max-width: 260px !important;
+  }
+  .flag-card-responsive .flag-inner {
+    max-width: 220px !important;
+    height: auto !important;
+  }
+}
+
+@media (max-height: 600px) {
+  .flag-card-responsive {
+    max-width: 200px !important;
+  }
+  .flag-card-responsive .flag-inner {
+    max-width: 168px !important;
+  }
+}

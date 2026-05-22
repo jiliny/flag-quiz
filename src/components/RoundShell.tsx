@@ -30,7 +30,7 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
   const p = palette[level];
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="h-dvh flex flex-col overflow-hidden">
       <div className={clsx('safe-pt px-4 py-3 text-white flex items-center justify-between', p.head)}>
         <Link
           to="/"
@@ -63,8 +63,8 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
         </div>
       </div>
 
-      <main className="flex-1 px-4 pt-4 pb-6 mx-auto w-full max-w-3xl flex flex-col items-center gap-5">
-        <h1 className={clsx('text-2xl sm:text-3xl font-bold text-center text-ink')}>
+      <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-3 sm:pt-4 pb-4 sm:pb-6 mx-auto w-full max-w-3xl flex flex-col items-center gap-3 sm:gap-5">
+        <h1 className={clsx('text-xl sm:text-3xl font-bold text-center text-ink')}>
           {question}
         </h1>
         <div className="flex justify-center w-full">{flagBlock}</div>
@@ -79,7 +79,7 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 60, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 220, damping: 20 }}
-            className="fixed inset-x-0 bottom-6 flex justify-center pointer-events-none"
+            className="fixed inset-x-0 bottom-6 safe-pb flex justify-center pointer-events-none z-50"
           >
             <div className="bg-white rounded-xl2 border-4 border-ink/10 shadow-sticker px-5 py-3 flex items-center gap-3 max-w-[90%]">
               <Globie mood={bannerMood ?? 'idle'} size={56} bobbing={false} />

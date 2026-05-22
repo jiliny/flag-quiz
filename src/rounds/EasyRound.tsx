@@ -87,8 +87,8 @@ export function EasyRound() {
       bannerText={bannerText}
       bannerMood={bannerMood}
       inputBlock={
-        <div className="flex flex-col items-center gap-4 sm:gap-5 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full max-w-xl">
+        <div className="flex flex-col items-center gap-2 sm:gap-5 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 w-full max-w-xl">
             {options.map((c) => {
               const isCorrect = c.code === answer.code;
               const isWrong = wrongCodes.has(c.code);
@@ -105,7 +105,7 @@ export function EasyRound() {
                   whileTap={phase === 'asking' && !isWrong ? { scale: 0.96, y: 4 } : undefined}
                   onClick={() => onPick(c)}
                   className={clsx(
-                    'no-select rounded-xl2 bg-white border-4 border-sky-deep shadow-sticker px-5 py-5 text-2xl sm:text-3xl font-bold text-ink min-h-[5rem] transition-all',
+                    'no-select rounded-2xl sm:rounded-xl2 bg-white border-[3px] sm:border-4 border-sky-deep shadow-sticker px-4 sm:px-5 py-3 sm:py-5 text-xl sm:text-3xl font-bold text-ink min-h-[3.25rem] sm:min-h-[5rem] transition-all',
                     showCorrectHighlight && 'bg-mint-soft border-mint-deep text-mint-deep',
                     isWrong && 'bg-candy-soft/60 border-candy-deep/40 text-candy-deep/70 opacity-60',
                     isShaking && 'animate-shake',
