@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
 export type GlobieMood = 'idle' | 'happy' | 'oops' | 'sleepy';
 
@@ -6,13 +7,14 @@ interface Props {
   mood?: GlobieMood;
   size?: number;
   bobbing?: boolean;
+  className?: string;
 }
 
 /**
  * Globie — a cheerful cartoon globe mascot.
  * Pure inline SVG, no asset deps. 4 expressions via the `mood` prop.
  */
-export function Globie({ mood = 'idle', size = 120, bobbing = true }: Props) {
+export function Globie({ mood = 'idle', size = 120, bobbing = true, className }: Props) {
   return (
     <motion.div
       animate={bobbing ? { y: [0, -6, 0] } : undefined}
@@ -20,7 +22,7 @@ export function Globie({ mood = 'idle', size = 120, bobbing = true }: Props) {
         bobbing ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } : undefined
       }
       style={{ width: size, height: size }}
-      className="select-none"
+      className={clsx("select-none", className)}
     >
       <svg viewBox="0 0 200 200" width={size} height={size} aria-hidden>
         <defs>

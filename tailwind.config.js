@@ -5,27 +5,27 @@ export default {
     extend: {
       colors: {
         sky: {
-          soft: '#BFE4FF',
-          main: '#3FB6FF',
-          deep: '#1F7FD6',
+          soft: '#D0EEFF',
+          main: '#48B6FF',
+          deep: '#1883E6',
         },
         mint: {
-          soft: '#C8F5DD',
-          main: '#3DD58A',
-          deep: '#1B8F58',
+          soft: '#D2F7E4',
+          main: '#46DB93',
+          deep: '#1C985E',
         },
         sun: {
-          soft: '#FFE7A8',
-          main: '#FFC23C',
-          deep: '#C7860B',
+          soft: '#FFF0CA',
+          main: '#FFC94D',
+          deep: '#D18E0B',
         },
         candy: {
-          soft: '#FFD3E2',
-          main: '#FF6FA3',
-          deep: '#C2356D',
+          soft: '#FFE0EB',
+          main: '#FF7FA9',
+          deep: '#CC3E75',
         },
         ink: '#1F2540',
-        cream: '#FFF8EE',
+        cream: '#FFFBF6',
       },
       fontFamily: {
         display: ['Fredoka', 'Baloo 2', 'system-ui', 'sans-serif'],
@@ -35,9 +35,9 @@ export default {
         pill: '9999px',
       },
       boxShadow: {
-        sticker: '0 10px 0 -2px rgba(0,0,0,0.08), 0 18px 30px -8px rgba(31,37,64,0.18)',
-        button: '0 5px 0 0 rgba(0,0,0,0.12)',
-        keycap: '0 4px 0 0 rgba(0,0,0,0.14)',
+        sticker: '0 8px 0 -2px rgba(0,0,0,0.06), 0 16px 24px -6px rgba(31,37,64,0.12)',
+        button: '0 4px 0 0 rgba(31,37,64,0.12)',
+        keycap: '0 3px 0 0 rgba(31,37,64,0.14)',
       },
       keyframes: {
         wobble: {

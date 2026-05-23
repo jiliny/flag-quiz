@@ -58,12 +58,12 @@ export function Keyboard(props: Props) {
       disabled={disabled}
       onClick={onClick}
       className={clsx(
-        'no-select rounded-2xl font-bold text-xl sm:text-2xl flex items-center justify-center bg-white border-2 border-ink/10 shadow-keycap select-none',
+        'no-select rounded-2xl font-bold text-xl sm:text-2xl flex items-center justify-center bg-white border border-ink/5 shadow-keycap select-none',
         'min-h-12 sm:min-h-14',
         wide ? 'px-4' : 'w-10 sm:w-11',
         'h-12 sm:h-14',
-        accent === 'green' && 'bg-mint-main text-white border-mint-deep',
-        accent === 'red' && 'bg-candy-soft text-candy-deep border-candy-deep',
+        accent === 'green' && 'bg-mint-main text-white border border-mint-deep/20',
+        accent === 'red' && 'bg-candy-soft text-candy-deep border border-candy-deep/20',
         disabled && 'opacity-40 pointer-events-none',
       )}
     >

@@ -32,7 +32,7 @@ export function FlagCard({ code, size = 'hero', wobble = true, className }: Prop
       transition={{ type: 'spring', stiffness: 220, damping: 18 }}
       style={{ maxWidth: '100%', width: outerW }}
       className={clsx(
-        'inline-block bg-white rounded-xl2 shadow-sticker border-[3px] border-ink/10 relative flag-card-responsive',
+        'inline-block bg-white rounded-xl2 shadow-sticker border-2 border-ink/5 relative flag-card-responsive',
         s.pad,
         wobble && 'animate-wobble',
         className,

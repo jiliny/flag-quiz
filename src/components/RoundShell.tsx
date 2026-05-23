@@ -31,33 +31,33 @@ export function RoundShell({ level, question, flagBlock, inputBlock, bannerMood,
 
   return (
     <div className="h-dvh flex flex-col overflow-hidden">
-      <div className={clsx('safe-pt px-4 py-3 text-white flex items-center justify-between', p.head)}>
+      <div className={clsx('safe-pt px-4 py-3.5 text-white flex items-center justify-between shadow-sm backdrop-blur-md', p.head)}>
         <Link
           to="/"
-          className="rounded-pill bg-white/20 hover:bg-white/30 px-4 py-2 text-white font-semibold flex items-center gap-1.5 transition-transform active:scale-95"
+          className="rounded-pill bg-white/15 hover:bg-white/25 border border-white/10 px-4 py-2 text-white font-bold text-sm flex items-center gap-1.5 transition-transform active:scale-95 shadow-sm"
           aria-label={t('back')}
         >
-          <Icons.BackArrow size={16} className="shrink-0" />
-          <span className="hidden sm:inline">{t('back')}</span>
+          <Icons.BackArrow size={14} className="shrink-0 text-white" />
+          <span>{t('back')}</span>
         </Link>
-        <div className="font-bold text-lg">
+        <div className="font-extrabold text-lg sm:text-xl tracking-wide select-none drop-shadow-sm">
           {t(`levels.${level}` as const)} · {prog.done} / {prog.total}
         </div>
         <div className="flex items-center gap-2">
-          <div className="rounded-pill bg-white/20 px-3 py-1.5 font-bold text-sm sm:text-base flex items-center gap-1 select-none">
-            <Icons.Coin size={18} className="shrink-0" />
+          <div className="rounded-pill bg-white/15 border border-white/10 px-3.5 py-1.5 font-extrabold text-sm sm:text-base flex items-center gap-1 shadow-sm select-none">
+            <Icons.Coin size={18} className="shrink-0 animate-[wobble_5s_ease-in-out_infinite]" />
             <span>{coins}</span>
           </div>
           <button
             type="button"
             onClick={() => setSound(!settings.sound)}
-            className="rounded-full bg-white/20 hover:bg-white/30 w-10 h-10 flex items-center justify-center text-white transition-transform active:scale-90"
+            className="rounded-full bg-white/15 border border-white/10 hover:bg-white/25 w-10 h-10 flex items-center justify-center text-white transition-transform active:scale-90 shadow-sm"
             aria-label={t('sound')}
           >
             {settings.sound ? (
-              <Icons.VolumeUp size={22} className="shrink-0" />
+              <Icons.VolumeUp size={22} className="shrink-0 text-white" />
             ) : (
-              <Icons.VolumeMute size={22} className="shrink-0" />
+              <Icons.VolumeMute size={22} className="shrink-0 text-white" />
             )}
           </button>
         </div>

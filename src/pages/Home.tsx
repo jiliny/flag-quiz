@@ -26,19 +26,19 @@ export function Home() {
 
   return (
     <div className="min-h-dvh safe-pt safe-pb px-4 pt-4 pb-6 max-w-2xl mx-auto flex flex-col">
-      <header className="flex items-center justify-between mb-2">
+      <header className="flex items-center justify-between mb-3.5">
         <div className="flex items-center gap-3">
-          <Globie mood="happy" size={84} />
+          <Globie mood="happy" size={80} className="animate-[floaty_3.5s_ease-in-out_infinite]" />
           <div>
-            <div className="text-3xl font-bold text-ink">{t('appTitle')}</div>
-            <div className="text-base text-ink/70">{t('hi')}</div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">{t('appTitle')}</h1>
+            <div className="text-sm sm:text-base font-semibold text-ink/60">{t('hi')}</div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onToggleLang}
-            className="no-select rounded-pill bg-white border-2 border-ink/10 px-3 py-2 text-base font-bold shadow-button flex items-center gap-1"
+            className="no-select rounded-pill bg-white border border-ink/5 px-3 py-2 text-sm sm:text-base font-extrabold shadow-button flex items-center gap-1.5 transition-transform active:scale-95"
             aria-label={t('language')}
           >
             <span aria-hidden>{settings.lang === 'en' ? '🇺🇸' : '🇨🇳'}</span>
@@ -46,10 +46,10 @@ export function Home() {
           </button>
           <Link
             to="/settings"
-            className="rounded-pill bg-white border-2 border-ink/10 w-11 h-11 flex items-center justify-center shadow-button transition-transform duration-300 hover:scale-105 active:scale-95"
+            className="rounded-pill bg-white border border-ink/5 w-11 h-11 flex items-center justify-center shadow-button transition-transform duration-300 hover:scale-105 active:scale-95"
             aria-label={t('settings')}
           >
-            <Icons.Gear size={24} className="transition-transform duration-500 hover:rotate-90 text-ink" />
+            <Icons.Gear size={22} className="transition-transform duration-700 hover:rotate-180 text-ink" />
           </Link>
         </div>
       </header>
@@ -82,16 +82,16 @@ export function Home() {
       </div>
 
       <motion.div
-        className="mt-5 flex justify-center"
-        whileTap={{ y: 4, scale: 0.97 }}
+        className="mt-6 flex justify-center"
+        whileTap={{ y: 3, scale: 0.98 }}
       >
         <Link
           to="/passport"
-          className="no-select rounded-pill bg-candy-main text-white font-bold text-xl px-7 py-4 shadow-button border-2 border-candy-deep flex items-center gap-2.5 transition-transform duration-200 hover:scale-103"
+          className="no-select rounded-pill bg-candy-main text-white font-extrabold text-lg sm:text-xl px-8 py-3.5 shadow-sticker border border-candy-deep/20 flex items-center gap-2.5 transition-transform duration-200"
         >
-          <Icons.Passport size={26} className="shrink-0" />
+          <Icons.Passport size={26} className="shrink-0 animate-[wobble_5s_ease-in-out_infinite]" />
           <span>{t('passport')}</span>
-          <span className="text-white font-extrabold flex items-center gap-1 ml-1 bg-white/20 px-2.5 py-1 rounded-full text-base border border-white/10 select-none">
+          <span className="text-white font-extrabold flex items-center gap-1 ml-1 bg-white/20 px-2.5 py-1 rounded-full text-sm sm:text-base border border-white/10 select-none shadow-inner">
             <Icons.Coin size={18} className="shrink-0" /> {coins}
           </span>
         </Link>

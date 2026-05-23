@@ -105,7 +105,7 @@ export function EasyRound() {
                   whileTap={phase === 'asking' && !isWrong ? { scale: 0.96, y: 4 } : undefined}
                   onClick={() => onPick(c)}
                   className={clsx(
-                    'no-select rounded-2xl sm:rounded-xl2 bg-white border-[3px] sm:border-4 border-sky-deep shadow-sticker px-4 sm:px-5 py-3 sm:py-5 text-xl sm:text-3xl font-bold text-ink min-h-[3.25rem] sm:min-h-[5rem] transition-all',
+                    'no-select rounded-2xl sm:rounded-xl2 bg-white border-2 border-sky-deep/20 shadow-sticker px-4 sm:px-5 py-3 sm:py-5 text-xl sm:text-3xl font-extrabold text-ink min-h-[3.25rem] sm:min-h-[5rem] transition-all',
                     showCorrectHighlight && 'bg-mint-soft border-mint-deep text-mint-deep',
                     isWrong && 'bg-candy-soft/60 border-candy-deep/40 text-candy-deep/70 opacity-60',
                     isShaking && 'animate-shake',

@@ -186,7 +186,7 @@ export function MediumRound() {
                   whileTap={!used && phase === 'asking' ? { scale: 0.9, y: 4 } : undefined}
                   onClick={() => handleTile(i)}
                   className={clsx(
-                    'no-select w-12 h-14 sm:w-14 sm:h-16 rounded-2xl text-2xl sm:text-3xl font-bold flex items-center justify-center border-2 border-mint-deep bg-white shadow-keycap transition-opacity',
+                    'no-select w-12 h-14 sm:w-14 sm:h-16 rounded-2xl text-2xl sm:text-3xl font-extrabold flex items-center justify-center border border-mint-deep/20 bg-white shadow-keycap transition-opacity',
                     used && 'opacity-0 pointer-events-none',
                     phase !== 'asking' && 'pointer-events-none',
                   )}

@@ -23,7 +23,7 @@ body {
   font-family: 'Fredoka', 'Baloo 2', system-ui, -apple-system, sans-serif;
   font-size: 20px;
   color: #1f2540;
-  background: linear-gradient(180deg, #bfe4ff 0%, #ffd3e2 60%, #ffe7a8 100%);
+  background: linear-gradient(180deg, #d0eeff 0%, #ffe0eb 60%, #fff0ca 100%);
   background-attachment: fixed;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;

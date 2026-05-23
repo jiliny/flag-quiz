@@ -29,16 +29,16 @@ function Toggle({
         onChange(!on);
       }}
       className={clsx(
-        'no-select relative w-[88px] h-12 rounded-pill border-2 transition-colors',
-        on ? 'bg-mint-main border-mint-deep' : 'bg-ink/15 border-ink/20',
+        'no-select relative w-[80px] h-11 rounded-pill border transition-colors shadow-button',
+        on ? 'bg-mint-main border-mint-deep/20' : 'bg-ink/10 border-ink/5',
       )}
     >
       <motion.span
         layout
         transition={{ type: 'spring', stiffness: 500, damping: 28 }}
         className={clsx(
-          'absolute top-1 w-9 h-9 rounded-full bg-white shadow-button flex items-center justify-center text-base font-bold',
-          on ? 'right-1' : 'left-1',
+          'absolute top-0.5 w-9.5 h-9.5 rounded-full bg-white shadow-button flex items-center justify-center text-sm font-extrabold',
+          on ? 'right-0.5' : 'left-0.5',
         )}
       >
         {on ? labelOn : labelOff}
@@ -58,16 +58,16 @@ export function Settings() {
       <header className="flex items-center justify-between">
         <Link
           to="/"
-          className="rounded-pill bg-white border-2 border-ink/10 px-4 py-2 font-semibold shadow-button flex items-center gap-1.5 transition-transform active:scale-95"
+          className="rounded-pill bg-white border border-ink/5 px-4 py-2 font-extrabold text-sm shadow-button flex items-center gap-1.5 transition-transform active:scale-95"
         >
-          <Icons.BackArrow size={16} className="text-ink shrink-0" />
+          <Icons.BackArrow size={14} className="text-ink shrink-0" />
           <span>{t('back')}</span>
         </Link>
-        <h1 className="text-2xl font-bold">{t('settings')}</h1>
+        <h1 className="text-2xl font-extrabold text-ink">{t('settings')}</h1>
         <div className="w-12" aria-hidden />
       </header>
 
-      <section className="bg-white rounded-xl2 border-4 border-ink/10 shadow-sticker p-4 sm:p-6 flex flex-col gap-5">
+      <section className="bg-white rounded-xl2 border-2 border-ink/5 shadow-sticker p-5 sm:p-7 flex flex-col gap-6">
         <Row label={t('language')}>
           <div className="flex gap-2">
             <LangPill
@@ -108,7 +108,7 @@ export function Settings() {
           <Toggle
             on={settings.testingMode}
             onChange={setTestingMode}
-            labelOn={<Icons.Flask size={20} className="text-ink shrink-0" />}
+            labelOn={<Icons.Flask size={18} className="text-ink shrink-0" />}
             labelOff=""
           />
         </RowWithCaption>
@@ -117,7 +117,7 @@ export function Settings() {
       <button
         type="button"
         onClick={() => setConfirmReset(true)}
-        className="no-select self-center rounded-pill bg-white border-2 border-candy-deep text-candy-deep font-semibold px-6 py-3 shadow-button"
+        className="no-select self-center rounded-pill bg-white border border-candy-deep/20 text-candy-deep font-extrabold text-base px-6 py-3 shadow-button active:translate-y-0.5"
       >
         {t('resetProgress')}
       </button>
@@ -128,22 +128,22 @@ export function Settings() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-ink/35 backdrop-blur-md flex items-end sm:items-center justify-center p-4"
           >
             <motion.div
               initial={{ y: 60, scale: 0.96 }}
               animate={{ y: 0, scale: 1 }}
               exit={{ y: 60, scale: 0.96 }}
-              className="bg-white rounded-xl2 border-4 border-ink/10 shadow-sticker p-6 max-w-md w-full flex flex-col items-center gap-4"
+              className="bg-white rounded-xl2 border-2 border-ink/5 shadow-sticker p-6 max-w-md w-full flex flex-col items-center gap-4"
             >
-              <Globie mood="oops" size={96} />
-              <h2 className="text-2xl font-bold text-center">{t('resetConfirmTitle')}</h2>
-              <p className="text-base text-ink/70 text-center">{t('resetConfirmDesc')}</p>
-              <div className="flex gap-3 mt-2">
+              <Globie mood="oops" size={88} className="animate-[floaty_3s_ease-in-out_infinite]" />
+              <h2 className="text-2xl font-extrabold text-center text-ink">{t('resetConfirmTitle')}</h2>
+              <p className="text-base font-semibold text-ink/65 text-center px-2">{t('resetConfirmDesc')}</p>
+              <div className="flex gap-3 mt-2 w-full max-w-xs">
                 <button
                   type="button"
                   onClick={() => setConfirmReset(false)}
-                  className="no-select rounded-pill bg-white border-2 border-ink/10 px-6 py-3 font-bold shadow-button"
+                  className="no-select flex-1 rounded-pill bg-white border border-ink/5 py-3 font-extrabold shadow-button text-ink active:translate-y-0.5 text-center"
                 >
                   {t('cancel')}
                 </button>
@@ -154,7 +154,7 @@ export function Settings() {
                     reset();
                     setConfirmReset(false);
                   }}
-                  className="no-select rounded-pill bg-candy-main text-white border-2 border-candy-deep px-6 py-3 font-bold shadow-button"
+                  className="no-select flex-1 rounded-pill bg-candy-main text-white border border-candy-deep/20 py-3 font-extrabold shadow-button active:translate-y-0.5 text-center"
                 >
                   {t('reset')}
                 </button>
@@ -170,7 +170,7 @@ export function Settings() {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <div className="text-xl font-semibold">{label}</div>
+      <div className="text-lg sm:text-xl font-extrabold text-ink">{label}</div>
       <div>{children}</div>
     </div>
   );
@@ -188,8 +188,8 @@ function RowWithCaption({
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex flex-col">
-        <div className="text-xl font-semibold">{label}</div>
-        <div className="text-sm text-ink/60">{caption}</div>
+        <div className="text-lg sm:text-xl font-extrabold text-ink">{label}</div>
+        <div className="text-sm font-semibold text-ink/50 mt-0.5">{caption}</div>
       </div>
       <div className="shrink-0">{children}</div>
     </div>
@@ -210,8 +210,8 @@ function LangPill({
       type="button"
       onClick={onClick}
       className={clsx(
-        'no-select rounded-pill px-5 py-3 font-bold text-lg border-2 shadow-button',
-        active ? 'bg-sky-main text-white border-sky-deep' : 'bg-white text-ink border-ink/10',
+        'no-select rounded-pill px-5 py-2.5 font-extrabold text-base border shadow-button transition-all',
+        active ? 'bg-sky-main text-white border-sky-deep/20' : 'bg-white text-ink border-ink/5 active:translate-y-0.5',
       )}
     >
       {children}

@@ -261,4 +261,38 @@ export const Icons = {
       </svg>
     );
   },
+
+  Pronounce({ size = 24, className, ...props }: IconProps) {
+    return (
+      <svg
+        viewBox="0 0 32 32"
+        width={size}
+        height={size}
+        className={className}
+        {...props}
+      >
+        {/* Shadow */}
+        <path
+          d="M6 11.5h4.2l5.3-5.3a1 1 0 011.5.7v18.2a1 1 0 01-1.5.7l-5.3-5.3H6a2 2 0 01-2-2v-5a2 2 0 012-2z"
+          fill="#1F2540"
+        />
+        {/* Megaphone speaker */}
+        <path
+          d="M6 10.5h4.2l5.3-5.3a1 1 0 011.5.7v18.2a1 1 0 01-1.5.7l-5.3-5.3H6a2 2 0 01-2-2v-5a2 2 0 012-2z"
+          fill="#A78BFA"
+          stroke="#1F2540"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+        {/* Dynamic Sound Waves */}
+        <path
+          d="M20 12c1 1.3 1 4.7 0 6M23.5 8c2.5 3 2.5 9 0 12M27 4c4 4.5 4 15.5 0 20"
+          stroke="#1F2540"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
+    );
+  },
 };

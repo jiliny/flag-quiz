@@ -38,14 +38,14 @@ export function AnswerBoxes({ slots, fixed, highlight = 'idle', size = 'md', onS
             disabled={!interactive}
             onClick={() => interactive && onSlotClick?.(idx)}
             className={clsx(
-              'no-select rounded-2xl flex items-end justify-center pb-1 font-bold border-[3px]',
+              'no-select rounded-2xl flex items-end justify-center pb-1 font-bold border-2',
               'shadow-button transition-colors',
               cellBase,
               isFixedLetter
-                ? 'bg-sky-soft/60 border-sky-deep/40 text-ink/80'
+                ? 'bg-sky-soft/60 border-sky-deep/15 text-ink/80'
                 : isFilled
-                  ? 'bg-white border-ink/30'
-                  : 'bg-white border-dashed border-ink/25',
+                  ? 'bg-white border-ink/5'
+                  : 'bg-white border-dashed border-ink/20',
               highlight === 'correct' && !isFixedLetter && 'bg-mint-soft border-mint-deep text-mint-deep',
               highlight === 'wrong' && !isFixedLetter && 'bg-candy-soft border-candy-deep text-candy-deep',
               interactive ? 'cursor-pointer' : 'cursor-default',
