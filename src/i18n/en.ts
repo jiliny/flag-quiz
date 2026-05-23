@@ -9,6 +9,7 @@ const en = {
   done: 'Done',
   yes: 'Yes',
   no: 'No',
+  countryDetails: 'Country Details',
 
   levels: {
     easy: 'Easy',

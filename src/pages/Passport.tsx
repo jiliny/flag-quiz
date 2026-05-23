@@ -5,10 +5,46 @@ import clsx from 'clsx';
 import { useGameStore, STAMP_CATALOG } from '../store/gameStore';
 import { getActivePool } from '../data/countries';
 import { useLang, useT } from '../i18n';
-import { FlagCard } from '../components/FlagCard';
 import { WorldMap } from '../components/WorldMap';
 import { Icons } from '../components/Icons';
 import { audio } from '../lib/audio';
+
+const SpeakerIcon = ({ size = 28, className }: { size?: number; className?: string }) => (
+  <svg
+    viewBox="0 0 32 32"
+    width={size}
+    height={size}
+    className={clsx("shrink-0", className)}
+  >
+    {/* Shadow */}
+    <path
+      d="M6 11.5h4.2l5.3-5.3a1 1 0 011.5.7v18.2a1 1 0 01-1.5.7l-5.3-5.3H6a2 2 0 01-2-2v-5a2 2 0 012-2z"
+      fill="#1F2540"
+    />
+    {/* Megaphone speaker */}
+    <path
+      d="M6 10.5h4.2l5.3-5.3a1 1 0 011.5.7v18.2a1 1 0 01-1.5.7l-5.3-5.3H6a2 2 0 01-2-2v-5a2 2 0 012-2z"
+      fill="#6CAEFF"
+      stroke="#1F2540"
+      strokeWidth="2.5"
+      strokeLinejoin="round"
+    />
+    {/* Sound Waves */}
+    <path
+      d="M20 12c1 1.3 1 4.7 0 6M23.5 8c2.5 3 2.5 9 0 12"
+      stroke="#1F2540"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      fill="none"
+    />
+  </svg>
+);
+
+const stampStyles: Record<string, { border: string; bg: string }> = {
+  '⭐': { border: 'border-[#FFAEC9]', bg: 'bg-[#FFF0F5]' }, // Star -> Soft Pink
+  '🎈': { border: 'border-[#A8E6CF]', bg: 'bg-[#F0FFF4]' }, // Balloon -> Soft Green
+  '🍕': { border: 'border-[#FFE29A]', bg: 'bg-[#FFFDF0]' }, // Pizza -> Soft Yellow/Gold
+};
 
 export function Passport() {
   const t = useT();
@@ -149,117 +185,163 @@ export function Passport() {
               exit={{ scale: 0.85, y: 15 }}
               transition={{ type: 'spring', stiffness: 220, damping: 18 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl2 border-2 border-ink/5 shadow-sticker p-6 max-w-sm w-full flex flex-col items-center gap-3"
+              className="bg-white rounded-xl2 border-[3px] border-ink shadow-sticker overflow-hidden max-w-sm w-full flex flex-col items-center gap-0"
             >
-              <div className="relative">
-                <FlagCard code={selectedCountry.code} size="md" wobble={false} />
-                {masteredAny.has(selectedCountry.code) && (
-                  <motion.span
-                    key={countryStamps[selectedCountry.code] || '⭐'}
-                    initial={{ scale: 0, rotate: -20 }}
-                    animate={{ scale: 1, rotate: 10 }}
-                    transition={{ type: 'spring', stiffness: 240, damping: 14 }}
-                    className="absolute -top-2 -right-2 text-3xl select-none filter drop-shadow-sm"
-                    aria-hidden
-                  >
-                    {countryStamps[selectedCountry.code] || '⭐'}
-                  </motion.span>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-2 mt-1">
-                <div className="text-2xl font-extrabold text-ink text-center">
-                  {masteredAny.has(selectedCountry.code) ? selectedCountry.name[lang] : '???'}
-                </div>
-                {masteredAny.has(selectedCountry.code) && (
+              {/* Header Bar */}
+              <div className="w-full bg-[#D5EEFF] border-b-[3px] border-ink px-4 py-3 flex items-center justify-between">
+                <div className="flex-1" />
+                <h2 className="text-xl font-extrabold text-ink select-none tracking-wide text-center">
+                  {t('countryDetails')}
+                </h2>
+                <div className="flex-1 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => speakName(selectedCountry.name[lang])}
-                    className="no-select rounded-full p-2 bg-purple-50 hover:bg-purple-100 text-purple-500 border border-purple-100 transition-transform active:scale-90 shadow-sm"
-                    aria-label="Read Country Name"
+                    onClick={() => selectCountryCode(null)}
+                    className="no-select w-8.5 h-8.5 rounded-full bg-white border-[3px] border-ink flex items-center justify-center text-ink hover:bg-sky-50 transition-all active:scale-90"
+                    aria-label="Close"
                   >
-                    <Icons.Pronounce size={18} className="shrink-0" />
+                    <span className="font-black text-sm leading-none select-none">✕</span>
                   </button>
-                )}
+                </div>
               </div>
-              
-              {masteredAny.has(selectedCountry.code) && (
-                <div className="w-full flex flex-col gap-2">
-                  <div className="text-sm font-bold text-ink/50 text-center uppercase tracking-wider">
-                    {selectedCountry.name.en} · {selectedCountry.name.zh}
+
+              {/* Wavy Pastel Pink/Peach Zone */}
+              <div className="w-full relative py-6 flex flex-col items-center justify-center bg-gradient-to-b from-[#FFEBF5] to-[#FFF0F6] overflow-hidden">
+                {/* Soft clouds and sparkles */}
+                <div className="absolute top-6 left-6 opacity-30 text-2xl select-none">☁️</div>
+                <div className="absolute top-8 right-6 opacity-30 text-2xl select-none">☁️</div>
+                <div className="absolute top-2 left-1/4 opacity-40 text-xs select-none">✨</div>
+                <div className="absolute top-10 right-1/4 opacity-40 text-sm select-none">✨</div>
+
+                {/* Curved wave bottom */}
+                <svg
+                  className="absolute bottom-0 left-0 w-full h-8 text-white fill-current pointer-events-none"
+                  viewBox="0 0 100 10"
+                  preserveAspectRatio="none"
+                >
+                  <path d="M 0 5 C 30 11, 70 -1, 100 5 L 100 10 L 0 10 Z" />
+                </svg>
+
+                {/* Polaroid flag card */}
+                <motion.div
+                  initial={{ rotate: -3, scale: 0.9, opacity: 0 }}
+                  animate={{ rotate: -3, scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+                  className="relative inline-block bg-white rounded-2xl shadow-sticker border-[3px] border-ink p-3.5 pb-9 rotate-[-3deg] z-10 w-[184px]"
+                >
+                  {/* Flag Inner */}
+                  <div
+                    className={clsx('rounded-lg overflow-hidden bg-ink/5 border border-ink/10', `fi-${selectedCountry.code}`)}
+                    style={{
+                      width: '152px',
+                      height: '114px',
+                      aspectRatio: '4 / 3',
+                      backgroundSize: 'contain',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                    role="img"
+                    aria-label={`Flag ${selectedCountry.code}`}
+                  />
+                  
+                  {/* FAIT MAIN Badge */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rotate-[-5deg] border-[1.5px] border-dashed border-ink/30 px-3 py-0.5 rounded text-[10px] font-black uppercase text-ink/50 tracking-wider bg-white select-none whitespace-nowrap">
+                    FAIT MAIN
                   </div>
-                  {/* Interactive SVG World Mini-Map */}
-                  <WorldMap code={selectedCountry.code} className="my-1" />
+                </motion.div>
+              </div>
+
+              {/* Country Name and Pronounce */}
+              <div className="w-full pt-4 pb-2 px-6 flex flex-col items-center justify-center">
+                <div className="text-3xl font-extrabold text-ink flex items-center justify-center gap-2">
+                  <span>{masteredAny.has(selectedCountry.code) ? selectedCountry.name[lang] : '???'}</span>
+                  {masteredAny.has(selectedCountry.code) && (
+                    <button
+                      type="button"
+                      onClick={() => speakName(selectedCountry.name[lang])}
+                      className="no-select inline-flex items-center transition-transform active:scale-95 ml-1"
+                      aria-label="Read Country Name"
+                    >
+                      <SpeakerIcon size={28} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* World Map Section */}
+              {masteredAny.has(selectedCountry.code) && (
+                <div className="w-full px-6 py-2">
+                  <WorldMap code={selectedCountry.code} />
                 </div>
               )}
 
               {!masteredAny.has(selectedCountry.code) && (
-                <div className="text-base font-semibold text-ink/50 text-center my-4">
+                <div className="text-base font-semibold text-ink/50 text-center my-6">
                   {t('empty')}
                 </div>
               )}
 
+              {/* Collect Stamps Section */}
               {masteredAny.has(selectedCountry.code) && (
-                <div className="w-full flex flex-col gap-2 border-t border-ink/5 pt-3">
-                  <div className="flex items-center justify-between text-xs font-extrabold text-ink/50 uppercase tracking-wider px-1">
-                    <span>{t('stampThisCountry')}</span>
-                    <span className="text-sun-deep flex items-center gap-1 bg-sun-soft/40 px-2.5 py-0.5 rounded-full font-extrabold border border-sun-main/20 shadow-inner">
-                      <Icons.Coin size={15} className="shrink-0" /> {coins}
-                    </span>
+                <div className="w-full px-6 pb-6 pt-1 flex flex-col gap-1.5">
+                  <div className="text-xs font-black text-ink/50 uppercase tracking-widest text-center">
+                    {t('stampThisCountry')}
                   </div>
                   
-                  <div className="grid grid-cols-6 gap-2 p-2 bg-ink/5 rounded-2xl border border-ink/5">
-                    {STAMP_CATALOG.map((stamp) => {
-                      const isUnlocked = unlockedStamps.includes(stamp.emoji);
-                      const isEquipped = (countryStamps[selectedCountry.code] || '⭐') === stamp.emoji;
-                      
-                      return (
-                        <button
-                          key={stamp.emoji}
-                          type="button"
-                          onClick={() => {
-                            if (isUnlocked) {
-                              audio.stamp();
-                              setCountryStamp(selectedCountry.code, stamp.emoji);
-                            } else {
-                              if (coins >= stamp.cost) {
-                                audio.unlock();
-                                buyStamp(stamp.emoji, stamp.cost);
+                  <div className="bg-[#EAF6FF] rounded-2xl border border-ink/10 p-3 flex flex-col gap-2.5">
+                    <div className="grid grid-cols-3 gap-3 w-full">
+                      {STAMP_CATALOG.map((stamp) => {
+                        const isUnlocked = unlockedStamps.includes(stamp.emoji);
+                        const isEquipped = (countryStamps[selectedCountry.code] || '⭐') === stamp.emoji;
+                        const style = stampStyles[stamp.emoji] || { border: 'border-ink/10', bg: 'bg-white' };
+                        
+                        return (
+                          <button
+                            key={stamp.emoji}
+                            type="button"
+                            onClick={() => {
+                              if (isUnlocked) {
+                                audio.stamp();
                                 setCountryStamp(selectedCountry.code, stamp.emoji);
                               } else {
-                                audio.wrong();
+                                if (coins >= stamp.cost) {
+                                  audio.unlock();
+                                  buyStamp(stamp.emoji, stamp.cost);
+                                  setCountryStamp(selectedCountry.code, stamp.emoji);
+                                } else {
+                                  audio.wrong();
+                                }
                               }
-                            }
-                          }}
-                          className={clsx(
-                            'no-select text-2xl w-11 h-11 rounded-full flex items-center justify-center relative transition-all border shadow-button',
-                            isEquipped && 'bg-mint-soft border-mint-deep scale-110 shadow-sticker z-10',
-                            !isEquipped && isUnlocked && 'bg-white border-ink/15 hover:border-ink/25 hover:scale-105 active:translate-y-0.5',
-                            !isUnlocked && 'bg-ink/5 border-dashed border-ink/20 opacity-60 hover:opacity-100 hover:scale-105'
-                          )}
-                          title={lang === 'en' ? stamp.name.en : stamp.name.zh}
-                          aria-label={lang === 'en' ? `Stamp ${stamp.name.en}` : `印章 ${stamp.name.zh}`}
-                        >
-                          <span className="select-none leading-none mt-[-1px]">{stamp.emoji}</span>
-                          {!isUnlocked && (
-                            <span className="absolute -bottom-1 -right-1.5 text-[9px] bg-sun-main text-ink border-2 border-ink rounded-full px-1.5 font-extrabold leading-none scale-75 select-none shadow-sm">
-                              {stamp.cost}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                            }}
+                            className="no-select relative w-full aspect-square bg-white border-[3px] border-ink rounded-2xl p-1.5 flex items-center justify-center transition-all active:translate-y-0.5 shadow-button hover:scale-102 hover:border-ink/90"
+                            title={lang === 'en' ? stamp.name.en : stamp.name.zh}
+                            aria-label={lang === 'en' ? `Stamp ${stamp.name.en}` : `印章 ${stamp.name.zh}`}
+                          >
+                            <div className={clsx('w-full h-full rounded-xl border-[3px] flex items-center justify-center', style.border, style.bg)}>
+                              <span className="text-3.5xl sm:text-4xl select-none leading-none mt-[-2px]">{stamp.emoji}</span>
+                            </div>
+                            
+                            {/* Equipped Indicator */}
+                            {isEquipped && (
+                              <div className="absolute -top-1.5 -right-1.5 bg-emerald-500 text-white border-[2.5px] border-ink rounded-full w-6.5 h-6.5 flex items-center justify-center text-xs font-black shadow-md z-20 animate-pop">
+                                ✓
+                              </div>
+                            )}
+
+                            {/* Locked Coin Badge */}
+                            {!isUnlocked && (
+                              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-sun-main border-[2px] border-ink text-[10px] font-black rounded-full px-2 py-0.25 flex items-center gap-0.5 shadow-md whitespace-nowrap z-20">
+                                <Icons.Coin size={11} className="shrink-0" />
+                                <span>{stamp.cost}</span>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
-
-              <button
-                type="button"
-                onClick={() => selectCountryCode(null)}
-                className="mt-2.5 rounded-pill bg-sky-main text-white font-extrabold px-6 py-2.5 shadow-button border border-sky-deep/20 transition-transform active:translate-y-0.5"
-              >
-                {t('done')}
-              </button>
             </motion.div>
           </motion.div>
         )}

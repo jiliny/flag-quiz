@@ -28,14 +28,6 @@ export const STAMP_CATALOG: Stamp[] = [
   { emoji: '⭐', cost: 0, name: { en: 'Star', zh: '星星' } },
   { emoji: '🎈', cost: 5, name: { en: 'Balloon', zh: '气球' } },
   { emoji: '🍕', cost: 10, name: { en: 'Pizza', zh: '披萨' } },
-  { emoji: '🦁', cost: 15, name: { en: 'Lion', zh: '狮子' } },
-  { emoji: '🐼', cost: 15, name: { en: 'Panda', zh: '熊猫' } },
-  { emoji: '🦖', cost: 20, name: { en: 'T-Rex', zh: '霸王龙' } },
-  { emoji: '🐳', cost: 25, name: { en: 'Whale', zh: '鲸鱼' } },
-  { emoji: '🦄', cost: 25, name: { en: 'Unicorn', zh: '独角兽' } },
-  { emoji: '🏎️', cost: 30, name: { en: 'Race Car', zh: '赛车' } },
-  { emoji: '🚀', cost: 30, name: { en: 'Rocket', zh: '火箭' } },
-  { emoji: '👑', cost: 50, name: { en: 'Crown', zh: '皇冠' } },
 ];
 
 interface State {

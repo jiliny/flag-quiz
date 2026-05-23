@@ -11,6 +11,7 @@ const zh: Dict = {
   done: '完成',
   yes: '是',
   no: '否',
+  countryDetails: '国家详情',
 
   levels: {
     easy: '简单',
