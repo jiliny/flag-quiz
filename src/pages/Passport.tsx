@@ -208,7 +208,7 @@ export function Passport() {
                     </span>
                   </div>
                   
-                  <div className="grid grid-cols-5 gap-2 max-h-36 overflow-y-auto p-1 bg-ink/5 rounded-2xl border border-ink/10">
+                  <div className="grid grid-cols-6 gap-2 p-2 bg-ink/5 rounded-2xl border border-ink/5">
                     {STAMP_CATALOG.map((stamp) => {
                       const isUnlocked = unlockedStamps.includes(stamp.emoji);
                       const isEquipped = (countryStamps[selectedCountry.code] || '⭐') === stamp.emoji;
