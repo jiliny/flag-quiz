@@ -64,12 +64,13 @@ flag-quiz/
 │   │   ├── FlagCard.tsx           # ★ fixed 4:3 polaroid, no stretch (see §7)
 │   │   ├── HintCard.tsx           # ★ slides in on wrong answer; reads c.hints[lang]
 │   │   ├── Globie.tsx             # the mascot (SVG, mood-driven expression)
+│   │   ├── Icons.tsx              # custom SVG icon pack (chunky/3D cartoon aesthetic)
 │   │   ├── LevelTile.tsx          # home-screen big button per difficulty
 │   │   ├── ProgressBar.tsx
 │   │   ├── AnswerBoxes.tsx        # letter/character slots for Medium + Hard
 │   │   ├── Keyboard.tsx           # QWERTY (en) OR Chinese char-grid (zh)
 │   │   ├── Celebrate.tsx          # canvas-confetti wrapper, celebrateAt(el)
-│   │   └── RoundShell.tsx         # shared header + flag + input + banner layout
+│   │   └── RoundShell.tsx         # ★ shared layout, now h-dvh + isolated main scroll
 │   │
 │   ├── rounds/
 │   │   ├── EasyRound.tsx          # 4-choice tap
@@ -128,7 +129,7 @@ imported once in `src/index.css`). Vite only bundles flags actually referenced.
 ## 4. State management — `src/store/gameStore.ts`
 
 A single Zustand store, persisted via `zustand/middleware/persist` to
-`localStorage` key **`flag-quiz-state-v1`** (currently `version: 2`).
+`localStorage` key **`flag-quiz-state-v1`** (currently `version: 3`).
 
 ```ts
 {
@@ -139,12 +140,34 @@ A single Zustand store, persisted via `zustand/middleware/persist` to
     expandedPool: boolean,
     testingMode: boolean   // unlock at TESTING_UNLOCK_COUNT instead of full pool
   },
-  recentlySeen: string[]   // rolling window of last 40 codes, any level
+  recentlySeen: string[],  // rolling window of last 40 codes, any level
+  coins: number,           // gold coin currency earned by getting flags correct
+  unlockedStamps: string[], // unlocked stamp emoji codes, default ['⭐']
+  countryStamps: Record<string, string> // maps country ISO code to active stamp emoji
 }
 ```
 
+Alongside the state, a `STAMP_CATALOG` constant is exported:
+```ts
+interface Stamp {
+  emoji: string;
+  cost: number;
+  name: { en: string; zh: string };
+}
+```
+Includes items like Star (`⭐`, 0), Balloon (`🎈`, 5), Pizza (`🍕`, 10), Lion (`🦁`, 15), Panda (`🐼`, 15), T-Rex (`🦖`, 20), Whale (`🐳`, 25), Unicorn (`🦄`, 25), Race Car (`🏎️`, 30), Rocket (`🚀`, 30), Crown (`👑`, 50).
+
 Actions: `markCorrect(level, code)`, `markSeen(code)`, `setLang`, `setSound`,
-`setExpandedPool`, `setTestingMode`, `reset`.
+`setExpandedPool`, `setTestingMode`, `buyStamp(stamp, cost)`, `setCountryStamp(code, stamp)`, `reset`.
+
+**Coin Earnings:**
+When `markCorrect(level, code)` is called:
+- If a flag is already mastered, it awards a `1` practice/review coin.
+- If a flag is a new mastery:
+  - Easy: `+1` coin
+  - Fill: `+2` coins
+  - Medium: `+3` coins
+  - Hard: `+5` coins
 
 Helpers exported alongside the store (pure functions over a snapshot):
 
@@ -162,9 +185,9 @@ Helpers exported alongside the store (pure functions over a snapshot):
 
 ### Store schema migrations
 
-Current version is `2`. A `migrate` function in `persist`'s config handles
-v1 → v2: it preserves existing `easy`/`medium`/`hard` mastered arrays, adds
-an empty `fill` array, and defaults `testingMode` to `false`.
+Current version is **`3`**. A `migrate` function in `persist`'s config handles:
+- **v1 → v2**: preserves `easy`/`medium`/`hard` mastered arrays, adds empty `fill` array, defaults `testingMode` to `false`.
+- **v2 → v3**: introduces `coins` (defaults to `0`), `unlockedStamps` (defaults to `['⭐']`), and `countryStamps` (defaults to `{}`).
 
 > **Bumping the store schema:** bump `version`, add another `if (version < N)`
 > branch in `migrate`, and write **defensive** code (always assume each
@@ -184,7 +207,7 @@ All three rounds follow the same flow and live in `src/rounds/`:
 3. **Receive input** → check via `isCorrect(guess, truth, lang)` (which
    normalizes case + strips non-letters for `en`, strips whitespace for `zh`).
 4. **On correct**: `audio.correct()` → confetti via `celebrateAt(el)` →
-   `markCorrect(level, code)` → 1.2–1.3 s success banner → `advance()` to next.
+   `markCorrect(level, code)` (adds coins!) → 1.2–1.3 s success banner → `advance()` to next.
 5. **On wrong**: `audio.wrong()` → increment `wrongCount` → input clears →
    `<HintCard>` reveals `hints[lang][(wrongCount - 1) % 3]`. **No answer is
    ever revealed.** The kid keeps trying.
@@ -279,7 +302,7 @@ Tailwind tokens are defined in `tailwind.config.js`:
 - **Font.** Fredoka via `@fontsource/fredoka` (imported in `index.css`,
   bundled — works offline).
 
-### The flag aspect-ratio rule (don't break this)
+### The flag aspect-ratio rule & height-responsive scaling
 
 `FlagCard` uses **fixed pixel dimensions per size variant** (`sm/md/lg/hero`)
 with `maxWidth: '100%'` for small-screen scaling and
@@ -290,6 +313,12 @@ was the explicit complaint we fixed.
 
 If you add a new size, add it to `sizeMap` in `src/components/FlagCard.tsx`,
 including its `padPx` for the outer polaroid wrapper.
+
+**Height-based responsive scaling (Pixel 10 Pro XL layout fix):**
+To ensure the layout fits perfectly on devices of all shapes and sizes (including tall viewports like Google Pixel 10 Pro XL, small viewports like iPhone SE, or wide viewports like tablets) without causing double scrollbars or button cutoffs:
+1. **Isolated Scroll:** `RoundShell` uses a rigid `h-dvh` + `overflow-hidden` container. The header is sticky, and the main play area is isolated via `flex-1 min-h-0 overflow-y-auto`.
+2. **Aspect Scaling:** `src/index.css` defines `.flag-card-responsive` scaling via `@media (max-height: 700px)` and `@media (max-height: 600px)`. It automatically shrinks the maximum width and height of the polaroid card (e.g., from `320px` to `260px` or `200px`) and scales the inner flag image.
+3. **Compact Buttons:** Button dimensions are responsive. Standard buttons in rounds like `EasyRound` drop from `py-5 text-3xl min-h-[5rem]` on large screens to compact `py-3 text-xl min-h-[3.25rem] gap-2` on mobile viewports.
 
 ### `no-select` and `safe-pt`/`safe-pb`
 
@@ -428,6 +457,20 @@ This is purely a developer/QA convenience; it's wired to localStorage like
 any other setting, so it persists per device. Leave it OFF for the real
 play experience.
 
+### Stamps & Passport Shop Customization
+
+Stamps are defined in the `STAMP_CATALOG` array in `src/store/gameStore.ts`.
+To add or modify stamps:
+1. Add/edit the stamp object with its `emoji`, `cost` (in coins), and bilingual `name` (`en` / `zh`).
+2. Custom assets/symbols can be added directly via emoji.
+3. Translation keys like `stampThisCountry` or `unlockStamp` are defined in `src/i18n/en.ts` and `src/i18n/zh.ts`.
+
+All passport grid and stamp-selection modal rendering lives in `src/pages/Passport.tsx`.
+
+### Custom SVG Icons Aesthetic
+
+All vector icons are gathered in `src/components/Icons.tsx`. They feature a chunky outline (`strokeWidth="2.5"` to `"3.2"`), heavy cartoonish dropshadows, and a playful 3D perspective to match the polaroid theme. Use `Icons.Coin`, `Icons.Passport`, `Icons.Gear`, etc., instead of importing third-party libraries.
+
 ### Change Globie's look
 
 `src/components/Globie.tsx` — pure SVG. `mood` accepts `'idle' | 'happy' |
@@ -519,6 +562,10 @@ after one online load.
 | -------------------------------- | ---------------------------------------------------------------------- |
 | The country list / hints         | `src/data/countries.ts`                                                |
 | App text / labels                | `src/i18n/en.ts` + `src/i18n/zh.ts`                                    |
+| Stamps catalog / costs           | `STAMP_CATALOG` in `src/store/gameStore.ts`                            |
+| Passport stamp selection modal   | `src/pages/Passport.tsx`                                               |
+| Custom SVG vector icons          | `src/components/Icons.tsx`                                             |
+| Coin rewarding mechanics         | `markCorrect` in `src/store/gameStore.ts`                              |
 | Unlock rules                     | `isLevelUnlocked` + `previousLevel` in `src/store/gameStore.ts`        |
 | Testing-mode threshold (default 5) | `TESTING_UNLOCK_COUNT` in `src/store/gameStore.ts`                   |
 | Easy distractor count            | `buildEasyOptions(...)` call in `EasyRound.tsx`                        |
@@ -529,6 +576,8 @@ after one online load.
 | Fill `zh` keyboard grid          | `buildFillSetup(...)` in `FillRound.tsx`                               |
 | Hint cycle behaviour             | `currentHint` lines in each round file                                 |
 | Flag size / aspect               | `sizeMap` in `src/components/FlagCard.tsx`                             |
+| Height-responsive card scaling   | `.flag-card-responsive` in `src/index.css` & `src/components/FlagCard.tsx` |
+| Mobile button dimensions / pads  | button class Lists in `EasyRound.tsx`, etc.                            |
 | Mascot look / moods              | `src/components/Globie.tsx`                                            |
 | Level tile / round palette       | `palette` map in `LevelTile.tsx` + `RoundShell.tsx`                    |
 | Fixed-letter slot styling (Fill) | `isFixedLetter` branch in `src/components/AnswerBoxes.tsx`             |
@@ -541,4 +590,4 @@ after one online load.
 
 ---
 
-_Last updated: 2026-05-18 (Fill level + testing mode)._
+_Last updated: 2026-05-22 (Coins, Stamps, custom Icons, and Pixel 10 Pro XL mobile viewport overflow fixes)._
